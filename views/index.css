@@ -1,0 +1,100 @@
+html { height: 100%; }
+
+body {
+    background-color: #effcef;
+    height: 100%;
+    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+    overflow: hidden;
+}
+#player {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+#player .player-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+#player .player-controls * {
+    margin: 10px;
+    padding: 10px;
+}
+
+#player .player-controls .skip-track {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#player .player-controls #play-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+#player .player-controls #play-btn:hover:not(.disabled-action) {
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+#player .player-controls #next-track:hover:not(.disabled-action) {
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+#player .player-controls #previous-track:hover:not(.disabled-action) {
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+.disabled-action {
+    opacity: 0.50;
+}
+
+
+#player #song-info {
+    text-align: center;
+}
+#player #song-info #song-name {
+    font-size: 2rem;
+}
+#player #song-info #artist-name {
+    font-size: 1rem;
+    opacity: 0.75;
+}
+
+
+/* THEMING  */
+.player-controls .theme-green {/*green*/
+    background-color: #94d3ac;
+    color: #effcef;
+}
+.player-controls .theme-purple {/*purple*/
+    background-color: rgb(124, 100, 143);
+    color: rgb(244, 230, 255);
+}
+
+.player-controls .theme-black { /*black*/
+    background-color: rgb(62, 66, 69);
+    color: rgb(217, 217, 217);
+}
+
+#song-name.theme-green { /*green*/ color: rgb(148, 211, 172);}
+#artist-name.theme-green { color: black;}
+
+#song-name.theme-purple {/*purple*/ color: rgb(124, 100, 143);}
+#artist-name.theme-purple { color: black;}
+
+#song-name.theme-black {/*black*/ color: rgb(217, 217, 217);}
+#artist-name.theme-black { color: rgb(217, 217, 217);}

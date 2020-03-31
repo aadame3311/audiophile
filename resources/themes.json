@@ -1,0 +1,21 @@
+[
+    {
+        "color_name": "green",
+        "rgb_primary": [148, 211, 172],
+        "rgb_foreground": [204, 237, 210],
+        "rgb_background": [239, 252, 239]
+    },
+    {
+        "color_name": "purple",
+        "rgb_primary": [124, 100, 143],
+        "rgb_foreground": [199, 175, 219],
+        "rgb_background": [244, 230, 255]
+
+    },
+    {
+        "color_name": "black",
+        "rgb_primary": [62, 66, 69],
+        "rgb_foreground": [217, 217, 217],
+        "rgb_background": [18, 18, 18]
+    }
+]
