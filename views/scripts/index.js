@@ -72,6 +72,9 @@ const addThemeChangeEventListeners = () => {
             changeThemeClass(settingsBtn, themeClass);
             changeThemeClass(settingsPanel, themeClass);
             changeThemeClass(dispStyleSelector, themeClass);
+
+            // createplaylist btn
+            changeThemeClass(uploadYTLink, themeClass);
         });
     }
 };

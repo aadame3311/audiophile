@@ -16,14 +16,6 @@
                     </div>
                 </div>
 
-                <div class="settings-item" id="display-style">
-                    <div class="label">Display Style: </div>
-                    <select id="display-style-selector" class="theme-green">
-                        <option value="rect">Bars</option>
-                        <option value="point">Dots</option>
-                        <option value="line">Line</option>
-                    </select>
-                </div>
                 <!-- color themes -->
                 <div class="settings-item" id="color-themes">
                     <div class="label">Theme: </div>
@@ -40,6 +32,25 @@
                         </div>
                         {{/each}}
                     </div>
+                </div>
+
+                <!-- display style -->
+                <div class="settings-item" id="display-style">
+                    <div class="label">Display Style: </div>
+                    <select id="display-style-selector" class="theme-green">
+                        <option value="rect">Bars</option>
+                        <option value="point">Dots</option>
+                        <option value="line">Line</option>
+                    </select>
+                </div>
+                
+                <!-- upload link to youtube -->
+                <div class="settings-item" id="create-playlist-container">
+                    <div class="label">Import Youtube Audio:</div>
+                    <form>
+                        <input type="text" id="import-link-input" name="youtube-link" />
+                        <div id="upload-yt-link-btn" class="btn theme-green">Import</div>
+                    </form>
 
                 </div>
             </div>

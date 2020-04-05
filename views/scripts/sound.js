@@ -3,7 +3,6 @@
 // variables used throughout this app
 let brightnessMultiplier = 1;
 let volume = 0.5;
-let song, songs;
 
 let prevAmpLevel = 0;
 let songIndex = 0;

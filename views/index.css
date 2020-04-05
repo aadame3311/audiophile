@@ -90,6 +90,24 @@ body {
     color: rgb(217, 217, 217);
 }
 
+.btn {
+    padding: 10px;
+    margin: 10px 0 10px 0;
+    text-align: center;
+}
+
+.btn.theme-green {
+    background-color: rgb(148, 211, 172);
+    color: black;
+}
+.btn.theme-purple {
+    background-color: rgb(124, 100, 143);
+    color: whitesmoke;
+}
+.btn.theme-black {
+    background-color: rgb(18, 18, 18);
+    color: rgb(217, 217, 217);
+}
 #song-name.theme-green { /*green*/ color: rgb(148, 211, 172);}
 #artist-name.theme-green { color: black;}
 

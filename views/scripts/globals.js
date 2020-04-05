@@ -1,3 +1,5 @@
+let song, songs;
+
 const drawProperties = {
     "rect": {
         drawFunction: (height, width, spectrum, waveform) => {
@@ -60,6 +62,9 @@ const volumeDisplayValue = document.getElementById('volume-value');
 
 const themeSelectors = document.getElementsByClassName("theme-selector-item");
 let isSettingsOpen = false;
+
+// create playlist btn
+const uploadYTLink = document.getElementById("upload-yt-link-btn");
 
 // get list of theme selector items
 let selectedThemeColor = {
