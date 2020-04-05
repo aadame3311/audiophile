@@ -10,6 +10,9 @@ const handlebars = require('express-handlebars');
 const path = require('path'); // Path module.
 const bodyParser = require('body-parser');
 
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
 app.engine('handlebars', handlebars({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
@@ -22,35 +25,9 @@ app.use(fileUpload({
     tempFileDir: 'tmp/'
 }));
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// configure ffmpeg
 ffmpeg.setFfmpegPath("./resources/ffmpeg/bin/ffmpeg.exe");
 
-// youtube dl
-// // const video = youtubedl("https://www.youtube.com/watch?v=XejVB_fba04",
-// //     ['--format=18'],
-// //     {cwd: __dirname}
-// // );
-// // video.on('info', function(info) {
-// //     console.log('Download Started')
-// //     console.log(`filename: ${info._filename}`)
-// //     console.log(`size: ${info.size}`)
-// // });
-// // video.on('end', () => {
-// //     console.log('finished downloading');
-// //     ffmpeg('tmp/videotest.mp4')
-// //         .toFormat('mp3')
-// //         .on('end', () => {
-// //             console.log("finished converting");
-// //         })
-// //         .on('error', (err) => {
-// //             console.log('An error occurred' + err.message);
-// //         })
-// //         .pipe(fs.createWriteStream('tmp/output.mp3'));
-// // })
-// // video.pipe(fs.createWriteStream('tmp/videotest.mp4'));
-
-
+/* view routes */
 app.get('/', (req, res) => {
 
     fs.readFile('./resources/themes.json', (err, json) => {
@@ -59,49 +36,71 @@ app.get('/', (req, res) => {
     })
 });
 
-// api
-app.post('/ytmp3', (req, res) => {
+/* api routes */
+app.post('/ytmp3', (req, res, next) => {
     console.log(req.body);
     let importLink = req.body.import_link;
     let fileName = "";
+    try {
+        // validate youtube link with regex...
+        let youtubeRegex = /https:\/\/www\.youtube\.com\/watch\?v=/;
+        const isMatch = importLink.match(youtubeRegex);
 
-    // validate youtube link with regex...
+        if (isMatch) {
+            // download youtube video...
+            io.emit('task-update', 'Starting Import...');
+            const video = youtubedl(importLink,
+                ['--format=18'],
+                {cwd: __dirname}
+            );
+            video.on('info', function(info) {
+                console.log('Download Started')
+                console.log(`filename: ${info._filename}`)
+                console.log(`size: ${info.size}`)
 
-    // download youtube video...
-    const video = youtubedl(importLink,
-        ['--format=18'],
-        {cwd: __dirname}
-    );
-    video.on('info', function(info) {
-        console.log('Download Started')
-        console.log(`filename: ${info._filename}`)
-        console.log(`size: ${info.size}`)
+                io.emit('task-update', 'Importing...');
+                fileName = info._filename.match(/.+?(?=\.mp4)/);
+            });
+            video.on('end', () => {
+                io.emit('task-update', 'Still loading...');
+                console.log('finished downloading');
+                // convert mp4 file to mp3.
+                ffmpeg('tmp/videotest.mp4')
+                    .toFormat('mp3')
+                    .on('end', () => {
+                        io.emit('task-update', 'complete');
+                        console.log("finished converting");
+                        // send response with the route to the song
+                        let resposneObj = {
+                            'name': fileName,
+                            'location': `songs/imports/${fileName}.mp3`
+                        }
+                        res.end(JSON.stringify(resposneObj));
+                    })
+                    .on('error', (err) => {
+                        io.emit('task-failed', 'error importing');
+                        console.log('An error occurred' + err.message);
+                    })
+                    .pipe(fs.createWriteStream(`views/songs/imports/${fileName}.mp3`));
+            })
+            video.pipe(fs.createWriteStream('tmp/videotest.mp4'));
+        } else {
+            io.emit('task-failed', 'invalid youtube link format.');
+            throw new Error('Error importing link');
+        }
+    } 
+    catch (err) {
+        res.status(500).send(err);
+    }
+});
 
-        fileName = info._filename;
+/* sockets */
+io.on('connection', (socket) => {
+    console.log('[a user connected]');
+    socket.on('task[import]-started', () => {
+        console.log('detected task start');
     });
-    video.on('end', () => {
-        console.log('finished downloading');
-        // convert mp4 file to mp3.
-        ffmpeg('tmp/videotest.mp4')
-            .toFormat('mp3')
-            .on('end', () => {
-                console.log("finished converting");
-                // send response with the route to the song
-                let resposneObj = {
-                    'name': fileName,
-                    'location': `songs/imports/song.mp3`
-                }
-                res.end(JSON.stringify(resposneObj));
-            })
-            .on('error', (err) => {
-                console.log('An error occurred' + err.message);
-            })
-            .pipe(fs.createWriteStream(`views/songs/imports/song.mp3`));
-    })
-    video.pipe(fs.createWriteStream('tmp/videotest.mp4'));
 
+});
 
-
-})
-
-app.listen(port, () => console.log(`Example app running on ${port}`));
+http.listen(port, () => console.log(`Example app running on ${port}`));

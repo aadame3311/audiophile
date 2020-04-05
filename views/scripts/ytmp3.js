@@ -1,19 +1,29 @@
-$("#upload-yt-link-btn").on('click', () => {
-    console.log('converting youtube to mp3');
+$("#upload-yt-link-btn").on('click', (e) => {
+    e.preventDefault();
     let importLink = $("#import-link-input").val();
+
+    // send request
+    socket.emit('task[import]-started');
     $.post("/ytmp3", {
         import_link: importLink
-    }, (res) => {
-        let response = JSON.parse(res);
-        console.log("done");
+    })
+    .done((res) => {
         console.log(res);
+        let response = JSON.parse(res);
         songs.push({
             'name': response.name,
             'artist': 'Import',
             'location': response.location
         })
+        // initiate player if this is the first song.
+        if (songs.length == 1) {
+            console.log('initiating sound.js');
+            let myp5 = new p5(soundFunctions);
 
+        }
         console.log(songs);
     })
-    console.log(importLink);
-})
+    .fail((xhr, status, error) => {
+        
+    })
+});

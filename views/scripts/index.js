@@ -85,7 +85,6 @@ const addDisplayStyleSelectorEventListener = () => {
     })
 };
 
-
 // execute functions on init
 addThemeChangeEventListeners();
 addDisplayStyleSelectorEventListener();

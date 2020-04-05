@@ -1,3 +1,13 @@
+
+@keyframes hideSnackbar {
+    from {top: 1rem;}
+    to {top: -3rem;}
+}
+@keyframes showSnackbar {
+    from {top: -3rem;}
+    to {top: 1rem;}
+}
+
 html { height: 100%; }
 
 body {
@@ -91,9 +101,18 @@ body {
 }
 
 .btn {
+    /*overriding default button styles*/
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+
     padding: 10px;
     margin: 10px 0 10px 0;
     text-align: center;
+}
+.btn:hover {
+    filter: brightness(1.1);
 }
 
 .btn.theme-green {
@@ -116,3 +135,32 @@ body {
 
 #song-name.theme-black {/*black*/ color: rgb(217, 217, 217);}
 #artist-name.theme-black { color: rgb(217, 217, 217);}
+
+/*snackbar*/
+.snackbar {
+    position: absolute;
+    
+    top: -3rem;
+    width: 50vw;
+    left: 25vw;
+
+    padding: 10px;
+
+    color: whitesmoke;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+    text-align: center;
+    z-index: 1000;
+}
+.snackbar.snackbar-error {
+    background-color: #B00020;
+}
+.snackbar.snackbar-success {
+    background-color: #4CAF50;
+}
+.snackbar.snackbar-show {
+    animation: showSnackbar 0.3s forwards;
+}
+.snackbar.snackbar-hide {
+    animation: hideSnackbar 0.3s forwards;
+}
