@@ -1,31 +1,26 @@
 /* socket receivers */
 socket.on('task-failed', (data) => {
-    toggleSnackbar({
+    SnackBar.toggle({
         type: 'error',
-        message: data,
+        message: '&#128711; ' + data + ' &#128711;',
         show: true,
-    }, () => {
-        $("#upload-yt-link-btn").prop('disabled', false);
-        snackbarTimeout = setTimeout(() => {
-            toggleSnackbar({
-                show: false
-            })
-        }, 3000)
+        new_instance: true,
+        auto_dismiss: true
     });
+    SnackBar.on('snackbar-dismissed', () => {
+        $("#upload-yt-link-btn").prop('disabled', false);
+    })
 })
 socket.on('task-update', (data) => {
-    toggleSnackbar({
+    const options = {
         type: 'success',
-        message: data,
-        show: true,
-    }, () => {
-        if (data == 'complete') {
-            snackbarTimeout = setTimeout(() => {
-                toggleSnackbar({
-                    show: false
-                })
-            }, 1000)
-        }
-    });
+        message: '&#128504; ' + data,
+        new_instance: (data == 'start'),
+        auto_dismiss: (data == 'complete'), // auto dismiss when task completes.
+    }
+    SnackBar.toggle(options);
     $("#upload-yt-link-btn").prop('disabled', (data!='complete'));
+});
+socket.on('dismiss-success-snackbars', () => {
+    dismissSuccessSnackbars();
 })

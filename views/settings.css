@@ -70,6 +70,10 @@
     cursor: pointer;
     border-radius: 20px;
 }
+#upload-yt-link-btn[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
 /* theme options */
 #theme-selector-container {

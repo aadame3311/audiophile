@@ -16,6 +16,7 @@ body {
     font-family: Futura, "Trebuchet MS", Arial, sans-serif;
     overflow: hidden;
 }
+
 #player {
     height: 100%;
     display: flex;
@@ -86,6 +87,10 @@ body {
 
 
 /* THEMING  */
+#body.theme-green {background-color: rgb(239, 252, 239);}
+#body.theme-purple {background-color: rgb(244, 230, 255);}
+#body.theme-black {background-color: rgb(18, 18, 18);}
+
 .player-controls .theme-green {/*green*/
     background-color: #94d3ac;
     color: #effcef;
@@ -144,6 +149,7 @@ body {
     width: 50vw;
     left: 25vw;
 
+    border-radius: 100px;
     padding: 10px;
 
     color: whitesmoke;
@@ -153,10 +159,10 @@ body {
     z-index: 1000;
 }
 .snackbar.snackbar-error {
-    background-color: #B00020;
+    background-color: rgba(176, 0, 32, 0.85);
 }
 .snackbar.snackbar-success {
-    background-color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.85);
 }
 .snackbar.snackbar-show {
     animation: showSnackbar 0.3s forwards;

@@ -12,7 +12,7 @@ let canPlayorPause = false;
 
 
 soundFunctions = (myp5) => {
-    console.log('adding sound event listeners');
+    
     // Event listeners
     playBtn.addEventListener('click', () => {
         if (sound.isLoaded()) {
@@ -98,14 +98,12 @@ soundFunctions = (myp5) => {
         }, 100)
     }
     const loadSong = playSong => {
-        console.log('init loadSong');
+        
         // Set display song name and artist
         const songNameContainer = document.getElementById('song-name');
         const artistNameContainer = document.getElementById('artist-name');
         songNameContainer.textContent = songs[songIndex].name;
         artistNameContainer.textContent = songs[songIndex].artist;
-
-
 
         sound = myp5.loadSound(songs[songIndex].location, () => {
             if (playSong) {
@@ -134,7 +132,7 @@ soundFunctions = (myp5) => {
 
     // implement from p5
     myp5.preload = () => {
-        console.log('init preload');
+        
         //sound = loadSound(songs[songIndex].location);
         song = songs[songIndex];
 
@@ -143,7 +141,7 @@ soundFunctions = (myp5) => {
 
     // implement from p5
     myp5.setup = function() {
-        console.log('init setup');
+        
         let cnv = myp5.createCanvas(myp5.windowWidth, myp5.windowHeight);
         let x = (myp5.windowWidth - myp5.width) / 2;
         let y = (myp5.windowHeight - myp5.height) / 2;

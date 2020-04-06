@@ -57,7 +57,9 @@ const addThemeChangeEventListeners = () => {
                 background: currThemeSelector.getAttribute('background').split(','),
             }
             let themeClass = `theme-${selectedThemeColor['name']}`;
-    
+            
+            changeThemeClass(body, themeClass);
+
             // player controls
             changeThemeClass(playBtn, themeClass);
             changeThemeClass(nextTrackBtn, themeClass);

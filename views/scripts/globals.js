@@ -58,6 +58,8 @@ const drawProperties = {
 };
 let selDrawOption = "rect";
 
+const body = document.getElementById("body");
+
 const settingsBtn = document.getElementById("settings-btn");
 const settingsPanel = document.getElementById("settings-panel");
 
@@ -93,55 +95,62 @@ let selectedThemeColor = {
 const songName = document.getElementById("song-name");
 const artistName = document.getElementById("artist-name");
 
-const toggleSnackbar = (options, callback = () => {}) => {
-    clearTimeout(snackbarTimeout);
-    let $snackbar = $(".snackbar");
-    let classes = Array.from($snackbar.prop('classList'));
-    let existingModifiers = classes.filter(className => className.match(/snackbar-.*/));
+const toggleErrorSnackbar = (options, callback = () => {}) => {
+    
+}
 
-    //$snackbar.removeClass(existingModifiers.join(' '));
-    $snackbar.removeClass("snackbar-show");
-    $snackbar.removeClass("snackbar-hide");
-    $snackbar.addClass(`snackbar-${(options.type)?options.type : 'none'}`);
-    $snackbar.text((options.message)?options.message : '');
+const dismissSuccessSnackbars = () => {
+    $(".snackbar-success").removeClass("snackbar-show");
+    $(".snackbar-success").addClass("snackbar-hide");
+    setTimeout(()=>{
+        $(".snackbar-success").remove();
+    }, 500);
+}
 
-    if (options.show) {
-        $snackbar.addClass('snackbar-show');
-    } else {
-        $snackbar.addClass('snackbar-hide');
+
+class SnackBar {
+    static on = (event, callback) => {
+        if (typeof callback == 'function') {
+            switch(event) {
+                case 'snackbar-dismissed':
+                    addEventListener('snackbar-dismissed', callback);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
-
-    // execute optional callback
-    callback();
-
-
-    // let $snackbar = $(".snackbar");
-    // let classes = Array.from($snackbar.prop('classList'));
-    // let existingModifiers = classes.filter(className => className.match(/snackbar-.*/));
+    static toggle = (options, callback = () => {}) => {
+        const snackbarDOM = $(`<div class='snackbar snackbar-${options.type}'></div>`);
+        const $body = $("#body");
+        let allSnackbars;
+        if (options.new_instance === true) {
+            $body.append(snackbarDOM);
+            allSnackbars = $(".snackbar"); //update 
+            snackbarDOM.addClass(`snackbar-${allSnackbars.length}`);
     
-    // if ($snackbar.hasClass(".snackbar-show")) {
-    //     // hide existing snackbar
-    //     clearTimeout(snackbarTimeout);
-    //     $snackbar.removeClass(existingModifiers.join(' '));
-    //     //$snackbar.removeClass("snackbar-show");
-    //     $snackbar.addClass("snackbar-hide");
-    // }
-
-    // // update modifiers
-    // existingModifiers = classes.filter(className => className.match(/snackbar-.*/));
-
-    // // show new snackbar
-    // $snackbar.addClass(`snackbar-${type}`);
-    // $snackbar.text(data);
-    // $snackbar.removeClass("snackbar-hide");
-    // $snackbar.addClass("snackbar-show");
+            $(`.snackbar-${allSnackbars.length}`).html(options.message);
+            snackbarDOM.addClass('snackbar-show');
+        }
+        else {
+            // update only latest snackbar
+            allSnackbars = $(".snackbar"); //update 
+            $(`.snackbar-${allSnackbars.length}`).html(options.message);
+        }
+        if (options.auto_dismiss) {
+            setTimeout(() => {
+                $(`.snackbar-${allSnackbars.length}`).removeClass('snackbar-show');
+                $(`.snackbar-${allSnackbars.length}`).addClass('snackbar-hide');
+                
+                setTimeout(()=>{
+                    $(`.snackbar-${allSnackbars.length}`).remove();
+                    dispatchEvent(new Event('snackbar-dismissed'));
+                }, 500)
+            }, 2000);
+        }
     
-    // if (withTimeout) {
-    //     // hide snackbar on timeout
-    //     snackbarTimeout = setTimeout(() => {
-    //         $snackbar.removeClass("snackbar-show");
-    //         $snackbar.addClass("snackbar-hide");
-    //     }, 3000)
-    // }
-    
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }       
 }

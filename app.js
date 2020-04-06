@@ -48,7 +48,8 @@ app.post('/ytmp3', (req, res, next) => {
 
         if (isMatch) {
             // download youtube video...
-            io.emit('task-update', 'Starting Import...');
+            io.emit('task-update', 'start');
+            io.emit('task-update', 'Starting Import');
             const video = youtubedl(importLink,
                 ['--format=18'],
                 {cwd: __dirname}
@@ -58,11 +59,12 @@ app.post('/ytmp3', (req, res, next) => {
                 console.log(`filename: ${info._filename}`)
                 console.log(`size: ${info.size}`)
 
-                io.emit('task-update', 'Importing...');
-                fileName = info._filename.match(/.+?(?=\.mp4)/);
+                io.emit('task-update', 'Importing');
+                let fileNameRaw = info._filename;
+                fileName = fileNameRaw.substring(0, fileNameRaw.length - 16);
             });
             video.on('end', () => {
-                io.emit('task-update', 'Still loading...');
+                io.emit('task-update', 'Still loading');
                 console.log('finished downloading');
                 // convert mp4 file to mp3.
                 ffmpeg('tmp/videotest.mp4')
@@ -78,14 +80,19 @@ app.post('/ytmp3', (req, res, next) => {
                         res.end(JSON.stringify(resposneObj));
                     })
                     .on('error', (err) => {
-                        io.emit('task-failed', 'error importing');
+                        io.emit('task-failed', 'Error converting to MP3');
                         console.log('An error occurred' + err.message);
                     })
                     .pipe(fs.createWriteStream(`views/songs/imports/${fileName}.mp3`));
             })
+            video.on('error', function error(err) {
+                io.emit('dismiss-success-snackbars');
+                io.emit('task-failed', 'Video ID not found');
+                res.status(500).send(err);
+            })
             video.pipe(fs.createWriteStream('tmp/videotest.mp4'));
         } else {
-            io.emit('task-failed', 'invalid youtube link format.');
+            io.emit('task-failed', 'invalid youtube link format');
             throw new Error('Error importing link');
         }
     } 
