@@ -59,7 +59,7 @@ app.post('/ytmp3', (req, res, next) => {
 
                 if (info.size > 30000000) {
                     io.emit('dismiss-success-snackbars');
-                    io.emit('task-failed', "");
+                    io.emit('task-failed', "File size is over 30MB");
                     
                     return;//res.status(500).send('error');
                 }
