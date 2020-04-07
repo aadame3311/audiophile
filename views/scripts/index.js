@@ -16,7 +16,9 @@ volumeDisplayValue.textContent = volumeSlider.value;
 volumeSlider.oninput = () => {
     let volumeValue = volumeSlider.value / 100; // 0 (silent) to 1 (full volume)
     volumeDisplayValue.textContent = volumeSlider.value;
-    sound.setVolume(volumeValue)
+    if (sound != null) {
+        sound.setVolume(volumeValue)
+    }
 }
 
 // toggles view of settings panel

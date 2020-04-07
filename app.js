@@ -55,22 +55,27 @@ app.post('/ytmp3', (req, res, next) => {
                 {cwd: __dirname}
             );
             video.on('info', function(info) {
-                console.log('Download Started')
-                console.log(`filename: ${info._filename}`)
-                console.log(`size: ${info.size}`)
+                console.log('[Download Started]')
+
+                if (info.size > 30000000) {
+                    io.emit('dismiss-success-snackbars');
+                    io.emit('task-failed', "");
+                    
+                    return;//res.status(500).send('error');
+                }
 
                 io.emit('task-update', 'Importing');
                 let fileNameRaw = info._filename;
                 fileName = fileNameRaw.substring(0, fileNameRaw.length - 16);
             });
             video.on('end', () => {
-                io.emit('task-update', 'Still loading');
+                io.emit('task-update', 'Processing');
                 console.log('finished downloading');
                 // convert mp4 file to mp3.
                 ffmpeg('tmp/videotest.mp4')
                     .toFormat('mp3')
                     .on('end', () => {
-                        io.emit('task-update', 'complete');
+                        io.emit('task-update', 'Done');
                         console.log("finished converting");
                         // send response with the route to the song
                         let resposneObj = {
@@ -104,6 +109,7 @@ app.post('/ytmp3', (req, res, next) => {
 /* sockets */
 io.on('connection', (socket) => {
     console.log('[a user connected]');
+
     socket.on('task[import]-started', () => {
         console.log('detected task start');
     });

@@ -164,6 +164,9 @@ body {
 .snackbar.snackbar-success {
     background-color: rgba(76, 175, 80, 0.85);
 }
+.snackbar.snackbar-info {
+    background-color: rgba(30,136,229, 0.85);
+}
 .snackbar.snackbar-show {
     animation: showSnackbar 0.3s forwards;
 }

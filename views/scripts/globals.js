@@ -4,6 +4,42 @@ let socket = io();
 let snackbarTimeout;
 let soundFunctions;
 
+/* default event listeners */
+$("#play-btn").on('click', () => {
+    if (songs.length == 0) {
+        dismissSnackbars('success');
+        dismissSnackbars('error');
+        SnackBar.create({
+            type: 'info',
+            message: '&#128712; ' + "Please import songs via the settings menu" + ' &#128712;',
+            auto_dismiss: true
+        });
+    }
+})
+$("#previous-track").on('click', () => {
+    if (songs.length <= 1) {
+        dismissSnackbars('success');
+        dismissSnackbars('error');
+        SnackBar.create({
+            type: 'info',
+            message: '&#128712; ' + "Please import more songs via the settings menu" + ' &#128712;',
+            auto_dismiss: true
+        });
+    }
+})
+$("#next-track").on('click', () => {
+    if (songs.length <= 1) {
+        dismissSnackbars('success');
+        dismissSnackbars('error');
+        SnackBar.create({
+            type: 'info',
+            message: '&#128712; ' + "Please import more songs via the settings menu" + ' &#128712;',
+            auto_dismiss: true
+        });
+    }
+})
+
+
 const drawProperties = {
     "rect": {
         drawFunction: (height, width, spectrum, waveform, myp5) => {
@@ -53,7 +89,7 @@ const drawProperties = {
         },
         stroke: (r, g, b, myp5) => myp5.stroke(r, g, b),
         fill: (r, g, b, myp5) => myp5.noFill(),
-        strokeWeight: (myp5) => myp5.strokeWeight(5),
+        strokeWeight: (myp5) => myp5.strokeWeight(3),
     },
 };
 let selDrawOption = "rect";
@@ -99,54 +135,44 @@ const toggleErrorSnackbar = (options, callback = () => {}) => {
     
 }
 
-const dismissSuccessSnackbars = () => {
-    $(".snackbar-success").removeClass("snackbar-show");
-    $(".snackbar-success").addClass("snackbar-hide");
+const dismissSnackbars = (type) => {
+    $(`.snackbar-${type}`).removeClass("snackbar-show");
+    $(`.snackbar-${type}`).addClass("snackbar-hide");
     setTimeout(()=>{
-        $(".snackbar-success").remove();
+        $(`.snackbar-${type}`).remove();
     }, 500);
 }
-
 
 class SnackBar {
     static on = (event, callback) => {
         if (typeof callback == 'function') {
             switch(event) {
-                case 'snackbar-dismissed':
-                    addEventListener('snackbar-dismissed', callback);
+                case 'error-snackbar-dismissed':
+                    addEventListener('error-snackbar-dismissed', callback);
                     break;
                 default:
                     break;
             }
         }
     }
-    static toggle = (options, callback = () => {}) => {
-        const snackbarDOM = $(`<div class='snackbar snackbar-${options.type}'></div>`);
+    static create = (options, callback = () => {}) => {
+        const snackbarDOM = $(`<div class='snackbar snackbar-${options.uuid} snackbar-${options.type}'>${options.message}</div>`);
+        console.log(snackbarDOM);
         const $body = $("#body");
-        let allSnackbars;
-        if (options.new_instance === true) {
-            $body.append(snackbarDOM);
-            allSnackbars = $(".snackbar"); //update 
-            snackbarDOM.addClass(`snackbar-${allSnackbars.length}`);
-    
-            $(`.snackbar-${allSnackbars.length}`).html(options.message);
-            snackbarDOM.addClass('snackbar-show');
-        }
-        else {
-            // update only latest snackbar
-            allSnackbars = $(".snackbar"); //update 
-            $(`.snackbar-${allSnackbars.length}`).html(options.message);
-        }
+
+        $body.append(snackbarDOM);
+        snackbarDOM.addClass('snackbar-show');
+
         if (options.auto_dismiss) {
             setTimeout(() => {
-                $(`.snackbar-${allSnackbars.length}`).removeClass('snackbar-show');
-                $(`.snackbar-${allSnackbars.length}`).addClass('snackbar-hide');
+                $(`.snackbar-${options.uuid}`).removeClass('snackbar-show');
+                $(`.snackbar-${options.uuid}`).addClass('snackbar-hide');
                 
                 setTimeout(()=>{
-                    $(`.snackbar-${allSnackbars.length}`).remove();
-                    dispatchEvent(new Event('snackbar-dismissed'));
+                    $(`.snackbar-${options.uuid}`).remove();
+                    dispatchEvent(new Event(`${options.type}-snackbar-dismissed`));
                 }, 500)
-            }, 2000);
+            }, 4000);
         }
     
         if (typeof callback === 'function') {

@@ -20,10 +20,14 @@ soundFunctions = (myp5) => {
         }
     });
     nextTrackBtn.addEventListener('click', () => {
-        skipSong('forward');
+        if (songs.length > 1) {
+            skipSong('forward');
+        }
     });
     prevTrackBtn.addEventListener('click', () => {
-        skipSong('backward');
+        if (songs.length > 1) {
+            skipSong('backward');
+        }
     });
 
     // Helper functions for events and overwrites on index.js
