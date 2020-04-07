@@ -41,6 +41,10 @@ app.get('/', (req, res) => {
 
 /* api routes */
 const handleImport = (socket, importLink) => {    
+    if (!fs.existsSync('./tmp')){
+        fs.mkdirSync('./tmp');
+    }
+
     let fileName = "";
     try {
         // validate youtube link with regex...
