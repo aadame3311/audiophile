@@ -14,6 +14,19 @@ socket.on('task-failed', (data) => {
     })
 })
 
+socket.on('done-importing', (data) => {
+    let response = JSON.parse(data);
+    songs.push({
+        'name': response.name.substring(response.name.indexOf('-') + 1),
+        'artist': response.name.match(/.+?(?=\-)/),
+        'location': response.location
+    })
+    // initiate player if this is the first song.
+    if (songs.length == 1) {
+        let myp5 = new p5(soundFunctions);
+    }
+});
+
 let taskUpdateSnackbarUUID;
 socket.on('task-update', (data) => {
     // instantiate new snackbar

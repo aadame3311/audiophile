@@ -9,9 +9,12 @@ const fileUpload = require('express-fileupload');
 const handlebars = require('express-handlebars');
 const path = require('path'); // Path module.
 const bodyParser = require('body-parser');
+const uuid = require('uuid');
 
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+
+let clients = {};
 
 app.engine('handlebars', handlebars({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
@@ -37,83 +40,91 @@ app.get('/', (req, res) => {
 });
 
 /* api routes */
-app.post('/ytmp3', (req, res, next) => {
-    console.log(req.body);
-    let importLink = req.body.import_link;
+const handleImport = (socket, importLink) => {    
     let fileName = "";
     try {
         // validate youtube link with regex...
         let youtubeRegex = /https:\/\/www\.youtube\.com\/watch\?v=/;
-        const isMatch = importLink.match(youtubeRegex);
+        const isValidFormat = importLink.match(youtubeRegex);
 
-        if (isMatch) {
+        if (isValidFormat) {
             // download youtube video...
-            io.emit('task-update', 'start');
-            io.emit('task-update', 'Starting Import');
+            socket.emit('task-update', 'start');
+            socket.emit('task-update', 'Starting Import');
             const video = youtubedl(importLink,
                 ['--format=18'],
                 {cwd: __dirname}
             );
             video.on('info', function(info) {
                 console.log('[Download Started]')
-
+                
+            
+                // emit error if file is too large.
                 if (info.size > 30000000) {
-                    io.emit('dismiss-success-snackbars');
-                    io.emit('task-failed', "File size is over 30MB");
+                    socket.emit('dismiss-success-snackbars');
+                    socket.emit('task-failed', "File size is over 30MB");
                     
-                    return;//res.status(500).send('error');
+                    return;
                 }
+                socket.emit('task-update', 'Importing');
 
-                io.emit('task-update', 'Importing');
                 let fileNameRaw = info._filename;
                 fileName = fileNameRaw.substring(0, fileNameRaw.length - 16);
             });
             video.on('end', () => {
-                io.emit('task-update', 'Processing');
+                socket.emit('task-update', 'Processing');
                 console.log('finished downloading');
                 // convert mp4 file to mp3.
                 ffmpeg('tmp/videotest.mp4')
                     .toFormat('mp3')
                     .on('end', () => {
-                        io.emit('task-update', 'Done');
+                        socket.emit('task-update', 'Done');
                         console.log("finished converting");
                         // send response with the route to the song
                         let resposneObj = {
                             'name': fileName,
                             'location': `songs/imports/${fileName}.mp3`
                         }
-                        res.end(JSON.stringify(resposneObj));
+                        socket.emit('done-importing', JSON.stringify(resposneObj));
+                        return;
+                        //res.end(JSON.stringify(resposneObj));
                     })
                     .on('error', (err) => {
-                        io.emit('task-failed', 'Error converting to MP3');
+                        socket.emit('task-failed', 'Error converting to MP3');
                         console.log('An error occurred' + err.message);
                     })
                     .pipe(fs.createWriteStream(`views/songs/imports/${fileName}.mp3`));
             })
             video.on('error', function error(err) {
-                io.emit('dismiss-success-snackbars');
-                io.emit('task-failed', 'Video ID not found');
-                res.status(500).send(err);
+                socket.emit('dismiss-success-snackbars');
+                socket.emit('task-failed', 'Video ID not found');
+
+                
             })
             video.pipe(fs.createWriteStream('tmp/videotest.mp4'));
         } else {
-            io.emit('task-failed', 'invalid youtube link format');
+            socket.emit('task-failed', 'invalid youtube link format');
             throw new Error('Error importing link');
         }
     } 
     catch (err) {
-        res.status(500).send(err);
+        console.log(`caught exception: ${err}`);
     }
-});
+}
 
 /* sockets */
 io.on('connection', (socket) => {
-    console.log('[a user connected]');
-
-    socket.on('task[import]-started', () => {
-        console.log('detected task start');
+    console.log(`[user ${socket.id} connected]`);
+    clients[socket.id] = {
+        address: socket.handshake.address,
+        connection_time: Date.now(),
+    }
+    socket.on('disconnect', () => {
+        delete clients[socket.id];
     });
-
+    socket.on('task[import]-started', (importLink) => {
+        handleImport(socket, importLink);
+    });
 });
 
 http.listen(port, () => console.log(`Example app running on ${port}`));
