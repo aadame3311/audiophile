@@ -157,7 +157,6 @@ class SnackBar {
     }
     static create = (options, callback = () => {}) => {
         const snackbarDOM = $(`<div class='snackbar snackbar-${options.uuid} snackbar-${options.type}'>${options.message}</div>`);
-        console.log(snackbarDOM);
         const $body = $("#body");
 
         $body.append(snackbarDOM);
