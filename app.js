@@ -23,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'views')));
 app.use(express.static(path.join(__dirname, 'scripts')));
 app.use(express.static(path.join(__dirname, 'songs')));
 app.use(express.static(path.join(__dirname, 'resources')));
+app.use(express.static(path.join(__dirname, 'resources/ffmpeg/bin')));
 app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: 'tmp/'
