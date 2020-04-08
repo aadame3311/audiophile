@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 8080;
 const fs = require('fs');
-const ffmpeg = require('fluent-ffmpeg');
+const fluentFFMPEG = require('fluent-ffmpeg');
 const youtubedl = require('youtube-dl');
 const handlebars = require('express-handlebars');
 const path = require('path'); // Path module.
@@ -22,10 +22,12 @@ app.use(express.static(path.join(__dirname, 'views')));
 app.use(express.static(path.join(__dirname, 'scripts')));
 app.use(express.static(path.join(__dirname, 'songs')));
 app.use(express.static(path.join(__dirname, 'resources')));
-app.use(express.static(path.join(__dirname, 'resources/ffmpeg/bin')));
 
 app.use(bodyParser.urlencoded({ extended: false }));
-ffmpeg.setFfmpegPath("./resources/ffmpeg/bin/ffmpe.exe");
+
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffmpeg = require('fluent-ffmpeg');
+fluentFFMPEG.setFfmpegPath(ffmpegPath);
 
 /* view routes */
 app.get('/', (req, res) => {
@@ -42,7 +44,6 @@ const handleImport = (socket, importLink) => {
         fs.mkdirSync('./tmp');
     }
     if (!fs.existsSync('./views/songs/imports')) {
-        fs.mkdirSync('./views');
         fs.mkdirSync('./views/songs');
         fs.mkdirSync('./views/songs/imports');
     }
