@@ -5,7 +5,6 @@ const port = 3000;
 const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
 const youtubedl = require('youtube-dl');
-const fileUpload = require('express-fileupload');
 const handlebars = require('express-handlebars');
 const path = require('path'); // Path module.
 const bodyParser = require('body-parser');
@@ -24,12 +23,9 @@ app.use(express.static(path.join(__dirname, 'scripts')));
 app.use(express.static(path.join(__dirname, 'songs')));
 app.use(express.static(path.join(__dirname, 'resources')));
 app.use(express.static(path.join(__dirname, 'resources/ffmpeg/bin')));
-app.use(fileUpload({
-    useTempFiles: true,
-    tempFileDir: 'tmp/'
-}));
+
 app.use(bodyParser.urlencoded({ extended: false }));
-ffmpeg.setFfmpegPath("./resources/ffmpeg/bin/ffmpeg.exe");
+ffmpeg.setFfmpegPath("./resources/ffmpeg/bin/ffmpe.exe");
 
 /* view routes */
 app.get('/', (req, res) => {
@@ -61,9 +57,6 @@ const handleImport = (socket, importLink) => {
                 {cwd: __dirname}
             );
             video.on('info', function(info) {
-                console.log('[Download Started]')
-                
-            
                 // emit error if file is too large.
                 if (info.size > 30000000) {
                     socket.emit('dismiss-success-snackbars');
@@ -92,7 +85,6 @@ const handleImport = (socket, importLink) => {
                         }
                         socket.emit('done-importing', JSON.stringify(resposneObj));
                         return;
-                        //res.end(JSON.stringify(resposneObj));
                     })
                     .on('error', (err) => {
                         socket.emit('task-failed', 'Error converting to MP3');
