@@ -41,8 +41,8 @@ const handleImport = (socket, importLink) => {
     if (!fs.existsSync('./tmp')){
         fs.mkdirSync('./tmp');
     }
-    if (!fs.existsSync('./songs/imports')) {
-        fs.mkdirSync('./songs/imports');
+    if (!fs.existsSync('./views/songs/imports')) {
+        fs.mkdirSync('./views/songs/imports');
     }
 
     let fileName = "";
