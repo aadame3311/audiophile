@@ -42,6 +42,8 @@ const handleImport = (socket, importLink) => {
         fs.mkdirSync('./tmp');
     }
     if (!fs.existsSync('./views/songs/imports')) {
+        fs.mkdirSync('./views');
+        fs.mkdirSync('./views/songs');
         fs.mkdirSync('./views/songs/imports');
     }
 
