@@ -120,6 +120,12 @@ let isSettingsOpen = false;
 // create playlist btn
 const uploadYTLink = document.getElementById("upload-yt-link-btn");
 
+// text inputs
+const textInput = document.getElementsByClassName("text-input");
+
+// my songs btn
+const mySongsBtn = document.getElementById("mysongs-btn");
+
 // get list of theme selector items
 let selectedThemeColor = {
     // default is green

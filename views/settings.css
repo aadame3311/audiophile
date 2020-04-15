@@ -1,10 +1,10 @@
 
 @keyframes closeSettingsPanel {
     from {left: -2rem;}
-    to {left: -15rem;}
+    to {left: -20rem;}
 }
 @keyframes openSettingsPanel {
-    from {left: -15rem;}
+    from {left: -20rem;}
     to {left: -2rem;}
 }
 
@@ -31,13 +31,16 @@
 
 #settings-panel {
     position: absolute;
-    left: -15rem; /* change to -15 */
+    left: -20rem; /* change to -15 */
     top: 5rem;
-    width: 12rem;
+    width: 16rem;
     height: 75%;
     /*opacity: 0.75;*/
     border-radius: 0 10px 10px 0;
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .settings #settings-panel.close-settings-animation {
     animation: closeSettingsPanel 0.5s forwards;
@@ -79,13 +82,14 @@
 #theme-selector-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-gap: 10px;
-    margin: 5px 10px;
+    margin: 5px 0px;
+
+    justify-items: center;
 }
 .theme-selector-item {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 100%;
+    height: 30px;
+
 }
 .theme-selector-item:hover {
     box-shadow: 0 0 10px 0 #94d3ac;
@@ -105,6 +109,20 @@
 
 #display-style-selector:hover {
     cursor: pointer;
+}
+
+input[type="text"] {
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+    border-bottom-style: hidden;
+
+    width: 100%;
+    margin: 0;
+    padding: 10px 0 10px 5px;
+    border-radius: 5px;
+    border: none;
+    margin: 4px 0;
 }
 
 
@@ -127,6 +145,15 @@
 .slider input.theme-black::-webkit-slider-thumb {
     background-color: rgb(64, 64, 64);
 }
+input[type="text"] .theme-green { /*green*/
+    background:-color #effcef;
+}
+input[type="text"] .theme-purple { /*purple*/
+    background-color: rgb(244, 230, 255);
+}
+input[type="text"] .theme-black { /*black*/
+    background-color: rgb(18, 18, 18);
+}
 #settings-btn.theme-green { /*green*/
     background-color: rgba(148, 211, 172, 0.75);
     color: #effcef;
@@ -148,15 +175,6 @@
 #settings-panel.theme-black{ /*black*/
     background-color: rgba(85, 91, 94, 0.33);
     color: rgb(217, 217, 217);
-}
-#display-style-selector.theme-green {
-    background-color: #effcef;
-}
-#display-style-selector.theme-purple {
-    background-color: rgb(244, 230, 255);
-}
-#display-style-selector.theme-black {
-    background-color: rgb(200, 200, 200);
 }
 
 

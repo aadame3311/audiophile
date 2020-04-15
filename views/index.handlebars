@@ -16,9 +16,23 @@
                     </div>
                 </div>
 
+                <hr/>
+
+                <!-- Song options -->
+                <div class="settings-item" id="song-options-container">
+                    <div class="label">Song Options:</div>
+                    <form>
+                        <input placeholder="Enter Youtube URL" type="text" id="import-link-input" class="theme-green text-input" name="youtube-link" />
+                        <button id="upload-yt-link-btn" class="btn theme-green">Import</button>
+                        <button id="mysongs-btn" class="btn theme-green">My Songs</button>
+                    </form>
+                </div>
+
+                <hr />
+
                 <!-- color themes -->
                 <div class="settings-item" id="color-themes">
-                    <div class="label">Theme: </div>
+                    <div class="label">Theme Options: </div>
                     <div id="theme-selector-container">
                         {{#each themes}}
                         <div 
@@ -32,11 +46,6 @@
                         </div>
                         {{/each}}
                     </div>
-                </div>
-
-                <!-- display style -->
-                <div class="settings-item" id="display-style">
-                    <div class="label">Display Style: </div>
                     <select id="display-style-selector" class="theme-green">
                         <option value="rect">Bars</option>
                         <option value="point-waveform">Dots-Waveform</option>
@@ -44,16 +53,7 @@
                         <option value="line">Line</option>
                     </select>
                 </div>
-                
-                <!-- upload link to youtube -->
-                <div class="settings-item" id="create-playlist-container">
-                    <div class="label">Import Youtube Audio:</div>
-                    <form>
-                        <input type="text" id="import-link-input" name="youtube-link" />
-                        <button id="upload-yt-link-btn" class="btn theme-green">Import</button>
-                    </form>
 
-                </div>
             </div>
         </div>
 

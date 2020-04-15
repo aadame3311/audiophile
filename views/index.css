@@ -16,7 +16,11 @@ body {
     font-family: Futura, "Trebuchet MS", Arial, sans-serif;
     overflow: hidden;
 }
-
+hr {
+    width: 95%;
+    opacity: 0.5;
+    border-width: 0.5px;
+}
 #player {
     height: 100%;
     display: flex;
@@ -113,7 +117,7 @@ body {
     width: 100%;
 
     padding: 10px;
-    margin: 10px 0 10px 0;
+    margin: 4px 0 4px 0;
     text-align: center;
 }
 .btn:hover {
@@ -132,6 +136,7 @@ body {
     background-color: rgb(18, 18, 18);
     color: rgb(217, 217, 217);
 }
+
 #song-name.theme-green { /*green*/ color: rgb(148, 211, 172);}
 #artist-name.theme-green { color: black;}
 
