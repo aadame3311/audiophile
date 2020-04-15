@@ -99,6 +99,9 @@ const body = document.getElementById("body");
 const settingsBtn = document.getElementById("settings-btn");
 const settingsPanel = document.getElementById("settings-panel");
 
+// song list modal song DOM elements
+let DOMSongListItems = $(".song-list");
+
 // display style dropdown
 const dispStyleSelector = document.getElementById("display-style-selector");
 
@@ -125,6 +128,9 @@ const textInput = document.getElementsByClassName("text-input");
 
 // my songs btn
 const mySongsBtn = document.getElementById("mysongs-btn");
+
+// song list modal
+const songListModalContainer = $("#songlist-container")
 
 // get list of theme selector items
 let selectedThemeColor = {

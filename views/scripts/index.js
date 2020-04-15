@@ -56,6 +56,14 @@ const changeThemeClass = (object, themeClass) => {
 settingsBtn.addEventListener('click', () => {
     toggleSettingsPanelView();
 });
+mySongsBtn.addEventListener('click', (e) => {
+    toggleSongListModal(e);
+})
+
+const toggleSongListModal = (e) => {
+    e.preventDefault();
+    songListModalContainer.prop('hidden', !songListModalContainer.prop('hidden'))
+}
 
 // add event listeners to change theme when clicking on theme selectors
 const addThemeChangeEventListeners = () => {

@@ -22,6 +22,9 @@ app.use(express.static(path.join(__dirname, 'views')));
 app.use(express.static(path.join(__dirname, 'scripts')));
 app.use(express.static(path.join(__dirname, 'songs')));
 app.use(express.static(path.join(__dirname, 'resources')));
+app.use(express.static(path.join(__dirname, 'partials')));
+app.use('/partials', express.static('views/partials'))
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 

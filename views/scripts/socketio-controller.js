@@ -16,11 +16,17 @@ socket.on('task-failed', (data) => {
 
 socket.on('done-importing', (data) => {
     let response = JSON.parse(data);
-    songs.push({
+    let songItem = {
         'name': response.name.substring(response.name.indexOf('-') + 1),
         'artist': response.name.match(/.+?(?=\-)/),
         'location': response.location
-    })
+    }
+    songs.push(songItem);
+
+    // push new song item to the DOM song list modal
+    let DOMSongItem = $(`<div id='songitem-${create_UUID()}' class='song-item'> ${songItem.name} </div>`)
+    DOMSongListItems.append(DOMSongItem);
+
     // initiate player if this is the first song.
     if (songs.length == 1) {
         let myp5 = new p5(soundFunctions);

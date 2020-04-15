@@ -15,6 +15,7 @@ body {
     height: 100%;
     font-family: Futura, "Trebuchet MS", Arial, sans-serif;
     overflow: hidden;
+    margin: 0;
 }
 hr {
     width: 95%;
@@ -112,6 +113,7 @@ hr {
 .btn {
     /*overriding default button styles*/
     border: none;
+    border-radius: 5px;
     text-decoration: none;
     cursor: pointer;
     width: 100%;
