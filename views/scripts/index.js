@@ -57,13 +57,13 @@ settingsBtn.addEventListener('click', () => {
     toggleSettingsPanelView();
 });
 mySongsBtn.addEventListener('click', (e) => {
-    toggleSongListModal(e);
-})
-
-const toggleSongListModal = (e) => {
     e.preventDefault();
-    songListModalContainer.prop('hidden', !songListModalContainer.prop('hidden'))
-}
+    SongListModal.toggle();
+});
+$("#modal-exit-icon").click((e) => {
+    e.preventDefault();
+    SongListModal.hide();
+});
 
 // add event listeners to change theme when clicking on theme selectors
 const addThemeChangeEventListeners = () => {
@@ -106,6 +106,9 @@ const addThemeChangeEventListeners = () => {
 
             // change theme for all text inputs.
             changeThemeClass(textInput[0], themeClass);
+
+            // change theme for song list modal
+            changeThemeClass(songListModal, themeClass);
         });
     }
 };

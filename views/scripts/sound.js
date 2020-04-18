@@ -7,8 +7,10 @@ let volume = 0.5;
 let prevAmpLevel = 0;
 let songIndex = 0;
 
-let canSkip = false; // prevents/allows user from skipping
+let canSkip = true; // prevents/allows user from skipping
 let canPlayorPause = false;
+
+let songSkipped = false;
 
 
 soundFunctions = (myp5) => {
@@ -19,12 +21,19 @@ soundFunctions = (myp5) => {
             togglePlay();
         }
     });
+    $("songitem-play-icon").click(()=>{
+        if (sound.isLoaded()) {
+            togglePlay();
+        }
+    })
     nextTrackBtn.addEventListener('click', () => {
+        songSkipped = true;
         if (songs.length > 1) {
             skipSong('forward');
         }
     });
     prevTrackBtn.addEventListener('click', () => {
+        songSkipped = true;
         if (songs.length > 1) {
             skipSong('backward');
         }
@@ -32,46 +41,63 @@ soundFunctions = (myp5) => {
 
     // Helper functions for events and overwrites on index.js
     const setPauseIcon = () => {
+        // for main player controls
         playBtnIcon.classList.remove('fa-play');
         playBtnIcon.classList.add('fa-pause');
+
+        // for song list items
+        $(`#${currentSongId} div i`).removeClass('fa-play');
+        $(`#${currentSongId} div i`).addClass('fa-pause');
     }
     const setPlayIcon = () => {
+        // for main player controls
         playBtnIcon.classList.remove('fa-pause')
         playBtnIcon.classList.add('fa-play')
+
+        // for song list items
+        $(`#${currentSongId} div i`).removeClass('fa-pause');
+        $(`#${currentSongId} div i`).addClass('fa-play');
+        //document.getElementById(songId).
     }
     const togglePlay = () => {
-        if (sound.isPlaying()) {
-            sound.pause();
+        if (currentSongPlaying.sound.isPlaying()) {
+            currentSongPlaying.sound.pause();
             setPlayIcon();
 
         } else {
-            sound.play();
+            currentSongPlaying.sound.play();
             setPauseIcon();
         }
     }
-    // Helps control when the user can't or can perform player actions (such as skip or play).
-    // This sort of 'regulation' helps with issues when a song hasn't loaded yet but user 
-    //      wants to skip. This caused a bug where we would have 2 songs playing at once, once the
-    //      the previous loadSound() action caught up to the new one.
+    // provides fine tuned control for pausing a song manually.
+    const setPause = () => {
+        if (currentSongPlaying.sound.isPlaying()) {
+            currentSongPlaying.sound.pause();
+            setPlayIcon();
+        }
+    }
+    // provides fine tuned control for playing a song manually.
+    const setPlay = () => {
+        if (!currentSongPlaying.sound.isPlaying()) {
+            currentSongPlaying.sound.play();
+            setPauseIcon();
+        }
+    }
+    /* Helps control when the user can't or can perform player actions (such as skip or play).
+        This sort of 'regulation' helps with issues when a song hasn't loaded yet but user 
+        wants to skip. This caused a bug where we would have 2 songs playing at once, once the
+        the previous loadSound() action caught up to the new one. */
     const togglePlayerActions = () => {
         canSkip = !canSkip;
         canPlayorPause = !canPlayorPause;
-        if (!canSkip && !canPlayorPause) {
-            nextTrackBtn.classList.add('disabled-action');
-            prevTrackBtn.classList.add('disabled-action');
-            playBtn.classList.add('disabled-action');
-        } else if (canSkip && canPlayorPause) {
-            nextTrackBtn.classList.remove('disabled-action');
-            prevTrackBtn.classList.remove('disabled-action');
-            playBtn.classList.remove('disabled-action');
-        }
     }
     const skipSong = direction => {
         // Update index and get rid of previous song
         //sound.stop();
         if (canSkip) {
-            togglePlayerActions();
-            sound.disconnect();
+            //togglePlayerActions();
+            setPause();
+            currentSongPlaying.sound.stop();
 
             switch (direction) {
                 case 'forward':
@@ -88,9 +114,11 @@ soundFunctions = (myp5) => {
                     break;
             }
 
-            loadSong(true);
+            loadSong("", "index");
+            // loadSong(getSong("", "index").sound.id, "index", true);
         }
 
+        songSkipped = false;
     }
     const resetBrightness = () => {
         const resetBrightnessInterval = setInterval(() => {
@@ -101,48 +129,87 @@ soundFunctions = (myp5) => {
             }
         }, 100)
     }
-    const loadSong = playSong => {
-        
-        // Set display song name and artist
+
+    /* meant to be used to store the sound object for a specific song.
+         this way the song can be played on demand without needing to be loaded every time. */
+    initSoundFile = (songId="") => {
+        console.log("initiating sound file");
+        var songToLoad = songs.find(song => song.uuid == songId);
+        return myp5.loadSound(songToLoad.location, () => loadSong(songId, "list", false));
+    }
+    // Set display song name and artist
+    setSongDetails = (song) => {
         const songNameContainer = document.getElementById('song-name');
         const artistNameContainer = document.getElementById('artist-name');
-        songNameContainer.textContent = songs[songIndex].name;
-        artistNameContainer.textContent = songs[songIndex].artist;
 
-        sound = myp5.loadSound(songs[songIndex].location, () => {
-            if (playSong) {
-                sound.play();
-                setPauseIcon();
-            } else {
-                sound.pause();
-                setPlayIcon();
+        songNameContainer.textContent = song.name;
+        artistNameContainer.textContent = song.artist;
+    }
+    getSong = (songId="", loadMethod) => {
+        switch(loadMethod) {
+            case "list":
+                var songToLoad = songs.find(song => song.uuid == songId);
+                songIndex = songToLoad.index;
+                break;
+            case "index":
+                var songToLoad = songs[songIndex];
+                break;
+            default: 
+                var songToLoad = songs[songs.length-1];
+        }
+
+        setSongDetails(songToLoad);
+        sound = songToLoad.sound;
+        return songToLoad;
+    }
+    // used when loading a song from init (when imported)
+    loadSong = (songId="", loadMethod, playSong=true) => {
+        // Get song depending on method specified.
+        songToLoad = getSong(songId, loadMethod);
+
+        songToLoad.sound.onended(() => {
+            // should only trigger this when the song ends (not skipped)
+            if (!songSkipped && songToLoad.sound.isPlaying() && loadMethod != "list") {
+                skipSong('foward');
             }
-
-            // volume needs to be set every time a song is loaded
-            sound.setVolume(volumeSlider.value / 100);
-
-            sound.onended(() => {
-                // P5 counts "paused" as onended. We don't want to skip song
-                // if user simply paused the song
-                if (!sound.isPaused()) {
-                    skipSong('forward');
-                } 
-            });
-
-            togglePlayerActions();
         });
-        
+
+        // only run onupdate
+        if (currentSongPlaying != null && currentSongPlaying.sound.isPlaying()) {
+            setPause();
+            console.log('pausing current song');
+            currentSongPlaying.sound.onended(() => {console.log('song ended without event')});
+            currentSongPlaying.sound.stop();
+        } 
+        currentSongPlaying = songToLoad;
+        currentSongId = songToLoad.uuid;
+
+        // set volume
+        currentSongPlaying.sound.setVolume(volumeSlider.value / 100);
+
+        (playSong)?setPlay():setPause();
     }
+    // used when selecting a song from a song list.
+    selectSong = (songId="", loadMethod) => {
+        selectedSong = getSong(songId, loadMethod);
 
-    // implement from p5
-    myp5.preload = () => {
-        
-        //sound = loadSound(songs[songIndex].location);
-        song = songs[songIndex];
+        // when selecting a new song from the list.
+        if (currentSongId != null && songId != currentSongId) {
+            setPause(); // pause previous song
+            currentSongPlaying.sound.onended(() => {console.log('song ended without event')});
+            currentSongPlaying.sound.stop();
 
-        loadSong();
+            currentSongId = songId;
+            currentSongPlaying = selectedSong;
+            setPlay();
+        } 
+        // when toggling play for the same song.
+        else if (currentSongId != null && songId == currentSongId) {
+            togglePlay();
+        } 
+
+        currentSongPlaying.sound.setVolume(volumeSlider.value / 100);
     }
-
     // implement from p5
     myp5.setup = function() {
         
@@ -156,9 +223,7 @@ soundFunctions = (myp5) => {
 
         fft = new p5.FFT();
         amplitude = new p5.Amplitude();
-        if (sound.isLoaded()) {
-            sound.amp(volumeSlider.value / 100);
-        }
+        
     }
 
     // implement from p5

@@ -7,3 +7,27 @@ function create_UUID(){
     });
     return uuid;
 }
+
+class SongListModal {
+    static show() {
+        $("#songlist-container").css("display", "block");
+    }
+    static hide() {
+        $("#songlist-container").css("display", "none");
+    }
+    static toggle() {
+        if (SongListModal.isOn()) {
+            SongListModal.hide();
+        } else {
+            SongListModal.show();
+        }
+    }
+    static isOn() {
+        return songListModalContainer.css("display") == "block";
+    }
+    static append(songItem) {
+        // push new song item to the DOM song list modal
+        let DOMSongItem = $(`<div id='${songItem.uuid}' class='song-item'> <div onclick="selectSong('${songItem.uuid}', 'list')"> <i class="songitem-play-icon fas fa-play fa-lg"></i></div> <div class="song-item-contents"> <span class="song-name">${songItem.name}</span> <span class="song-artist">${songItem.artist}</span></div></div>`)
+        $(".song-list").append(DOMSongItem);
+    }
+} 

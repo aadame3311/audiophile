@@ -4,16 +4,18 @@ const app = express();
 const port = process.env.PORT || 8080;
 const fs = require('fs');
 const fluentFFMPEG = require('fluent-ffmpeg');
-const youtubedl = require('youtube-dl');
+const youtubedl = require('ytdl-core');
 const handlebars = require('express-handlebars');
 const path = require('path'); // Path module.
 const bodyParser = require('body-parser');
-const uuid = require('uuid');
+const uuidv4 = require('uuid/v4');
+const cookieParser = require('cookie-parser');
 
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 let clients = {};
+let songs = [];
 
 app.engine('handlebars', handlebars({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
@@ -25,16 +27,17 @@ app.use(express.static(path.join(__dirname, 'resources')));
 app.use(express.static(path.join(__dirname, 'partials')));
 app.use('/partials', express.static('views/partials'))
 
-
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 fluentFFMPEG.setFfmpegPath(ffmpegPath);
 
+//let sessionIDs = {};
+
 /* view routes */
 app.get('/', (req, res) => {
-
     fs.readFile('./resources/themes.json', (err, json) => {
         let themes = JSON.parse(json);
         res.render('index', {"themes": themes});
@@ -46,26 +49,26 @@ const handleImport = (socket, importLink) => {
     if (!fs.existsSync('./tmp')){
         fs.mkdirSync('./tmp');
     }
-    if (!fs.existsSync('./views/songs/imports')) {
-        fs.mkdirSync('./views/songs');
-        fs.mkdirSync('./views/songs/imports');
+    if (!fs.existsSync(`./views/songs/imports/${socket.id}`)) {
+        fs.mkdirSync(`./views/songs/imports/${socket.id}`);
     }
 
-    let fileName = "";
+    let songName = "";
+    let artistName = "";
     try {
         // validate youtube link with regex...
         let youtubeRegex = /https:\/\/www\.youtube\.com\/watch\?v=/;
         const isValidFormat = importLink.match(youtubeRegex);
+        let uuid = uuidv4();
 
         if (isValidFormat) {
             // download youtube video...
             socket.emit('task-update', 'start');
             socket.emit('task-update', 'Starting Import');
-            const video = youtubedl(importLink,
-                ['--format=18'],
-                {cwd: __dirname}
-            );
+            const video = youtubedl(importLink, { filter: format => format.container === 'mp4' });
+
             video.on('info', function(info) {
+                console.log('starting import');
                 // emit error if file is too large.
                 if (info.size > 30000000) {
                     socket.emit('dismiss-success-snackbars');
@@ -75,8 +78,8 @@ const handleImport = (socket, importLink) => {
                 }
                 socket.emit('task-update', 'Importing');
 
-                let fileNameRaw = info._filename;
-                fileName = fileNameRaw.substring(0, fileNameRaw.length - 16);
+                songName = info.player_response.videoDetails.title;
+                artistName = info.author.name;
             });
             video.on('end', () => {
                 socket.emit('task-update', 'Processing');
@@ -89,8 +92,10 @@ const handleImport = (socket, importLink) => {
                         console.log("finished converting");
                         // send response with the route to the song
                         let resposneObj = {
-                            'name': fileName,
-                            'location': `songs/imports/${fileName}.mp3`
+                            'name': songName,
+                            'artist': artistName,
+                            'uuid': uuid,
+                            'location': `songs/imports/${socket.id}/${uuid}.mp3`
                         }
                         socket.emit('done-importing', JSON.stringify(resposneObj));
                         return;
@@ -99,7 +104,7 @@ const handleImport = (socket, importLink) => {
                         socket.emit('task-failed', 'Error converting to MP3');
                         console.log('An error occurred' + err.message);
                     })
-                    .pipe(fs.createWriteStream(`views/songs/imports/${fileName}.mp3`));
+                    .pipe(fs.createWriteStream(`views/songs/imports/${socket.id}/${uuid}.mp3`));
             })
             video.on('error', function error(err) {
                 socket.emit('dismiss-success-snackbars');
@@ -120,7 +125,8 @@ const handleImport = (socket, importLink) => {
 
 /* sockets */
 io.on('connection', (socket) => {
-    console.log(`[user ${socket.id} connected]`);
+    console.log(`new user: ${socket.id}`);
+
     clients[socket.id] = {
         address: socket.handshake.address,
         connection_time: Date.now(),

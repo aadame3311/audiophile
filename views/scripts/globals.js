@@ -3,6 +3,26 @@ let songs = [];
 let socket = io();
 let snackbarTimeout;
 let soundFunctions;
+let loadSong, initSoundFile, setSongDetails, selectSong;
+let currentSongPlaying, currentSongId;
+
+(function onInit() {
+    //localStorage.clear();
+    $(document).ready(() => {
+        if (localStorage.getItem("userSongs")) {
+            songs = JSON.parse(localStorage.getItem("userSongs"));
+
+            let myp5 = new p5(soundFunctions);
+
+            // append all songs to songlist modal
+            songs.forEach((song)=> {
+                SongListModal.append(song);
+                song.sound = initSoundFile(song.uuid);
+            });
+        }
+        console.log(`userSongs: ${songs.length}`);
+    })
+})();
 
 /* default event listeners */
 $("#play-btn").on('click', () => {
@@ -101,6 +121,8 @@ const settingsPanel = document.getElementById("settings-panel");
 
 // song list modal song DOM elements
 let DOMSongListItems = $(".song-list");
+const songListModal = document.getElementById("songlist-modal")
+const songListModalContainer = $("#songlist-container")
 
 // display style dropdown
 const dispStyleSelector = document.getElementById("display-style-selector");
@@ -129,8 +151,6 @@ const textInput = document.getElementsByClassName("text-input");
 // my songs btn
 const mySongsBtn = document.getElementById("mysongs-btn");
 
-// song list modal
-const songListModalContainer = $("#songlist-container")
 
 // get list of theme selector items
 let selectedThemeColor = {

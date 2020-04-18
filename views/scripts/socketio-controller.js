@@ -1,3 +1,4 @@
+
 /* socket receivers */
 socket.on('task-failed', (data) => {
     dismissSnackbars('info');
@@ -15,22 +16,30 @@ socket.on('task-failed', (data) => {
 })
 
 socket.on('done-importing', (data) => {
+
+    
+    // read response
     let response = JSON.parse(data);
     let songItem = {
-        'name': response.name.substring(response.name.indexOf('-') + 1),
-        'artist': response.name.match(/.+?(?=\-)/),
-        'location': response.location
+        'index': songs.length,
+        'name': (response.name)?response.name:"",
+        'artist': (response.artist)?response.artist:"",
+        'location': response.location,
+        'uuid': response.uuid,
+        'sound': ""
     }
     songs.push(songItem);
 
     // push new song item to the DOM song list modal
-    let DOMSongItem = $(`<div id='songitem-${create_UUID()}' class='song-item'> ${songItem.name} </div>`)
-    DOMSongListItems.append(DOMSongItem);
+    SongListModal.append(songItem);
 
-    // initiate player if this is the first song.
+    // initiate p5 if this is the first song. Only need to do this upon the first song loading.
     if (songs.length == 1) {
         let myp5 = new p5(soundFunctions);
     }
+
+    songs[songs.length-1].sound = initSoundFile(songs[songs.length-1].uuid);
+    localStorage.setItem("userSongs", JSON.stringify(songs));
 });
 
 let taskUpdateSnackbarUUID;
