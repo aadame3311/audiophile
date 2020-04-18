@@ -14,7 +14,7 @@
     "path": "^0.12.7",
     "socket.io": "^2.3.0",
     "uuid": "^7.0.3",
-    "youtube-dl": "^3.0.2"
+    "ytdl-core": "^2.1.0"
   },
   "devDependencies": {},
   "scripts": {

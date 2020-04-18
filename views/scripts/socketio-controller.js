@@ -17,19 +17,25 @@ socket.on('task-failed', (data) => {
 socket.on('done-importing', (data) => {
     let response = JSON.parse(data);
     let songItem = {
+        'index': songs.length,
         'name': response.name.substring(response.name.indexOf('-') + 1),
-        'artist': response.name.match(/.+?(?=\-)/),
-        'location': response.location
+        'artist': response.artist,
+        'location': response.location,
+        'uuid': response.uuid
     }
     songs.push(songItem);
 
     // push new song item to the DOM song list modal
-    let DOMSongItem = $(`<div id='songitem-${create_UUID()}' class='song-item'> ${songItem.name} </div>`)
-    DOMSongListItems.append(DOMSongItem);
+    let artist = (songItem.artist)?songItem.artist:"";
+    let name = (songItem.name)?songItem.name:"";
+    let uuid = songItem.uuid;
 
     // initiate player if this is the first song.
     if (songs.length == 1) {
         let myp5 = new p5(soundFunctions);
+
+        let DOMSongItem = $(`<div id='${uuid}' class='song-item'> <div onclick="loadSong('${uuid}', true)">PLAY</div> <span class="song-name">${name}</span> <span class="song-artist">${artist}</span></div>`)
+        DOMSongListItems.append(DOMSongItem);
     }
 });
 

@@ -62,7 +62,12 @@ mySongsBtn.addEventListener('click', (e) => {
 
 const toggleSongListModal = (e) => {
     e.preventDefault();
-    songListModalContainer.prop('hidden', !songListModalContainer.prop('hidden'))
+    if (songListModalContainer.css("display") == "block") {
+        songListModalContainer.css("display", "none");
+    } else {
+        songListModalContainer.css("display", "block");
+    }
+    //songListModalContainer.prop('hidden', !songListModalContainer.prop('hidden'))
 }
 
 // add event listeners to change theme when clicking on theme selectors
@@ -106,6 +111,9 @@ const addThemeChangeEventListeners = () => {
 
             // change theme for all text inputs.
             changeThemeClass(textInput[0], themeClass);
+
+            // change theme for song list modal
+            changeThemeClass(songListModal, themeClass);
         });
     }
 };

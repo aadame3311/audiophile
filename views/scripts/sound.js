@@ -101,15 +101,25 @@ soundFunctions = (myp5) => {
             }
         }, 100)
     }
-    const loadSong = playSong => {
-        
+
+    //
+    loadSong = (songId="", playSong) => {
+        console.log('loading song');
         // Set display song name and artist
         const songNameContainer = document.getElementById('song-name');
         const artistNameContainer = document.getElementById('artist-name');
         songNameContainer.textContent = songs[songIndex].name;
         artistNameContainer.textContent = songs[songIndex].artist;
 
-        sound = myp5.loadSound(songs[songIndex].location, () => {
+        // load by songId, else by current index
+        if (songId != "") {
+            var songToLoad = songs.find(song => song.uuid == songId);
+            songIndex = songToLoad.index;
+        } else {
+            var songToLoad = songs[songIndex];
+        }
+        
+        sound = myp5.loadSound(songToLoad.location, () => {
             if (playSong) {
                 sound.play();
                 setPauseIcon();
