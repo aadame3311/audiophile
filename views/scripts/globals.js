@@ -3,6 +3,7 @@ let songs = [];
 let socket = io();
 let snackbarTimeout;
 let soundFunctions;
+<<<<<<< HEAD
 let loadSong, initSoundFile, setSongDetails, selectSong;
 let currentSongPlaying, currentSongId;
 
@@ -23,6 +24,9 @@ let currentSongPlaying, currentSongId;
         console.log(`userSongs: ${songs.length}`);
     })
 })();
+=======
+let loadSong;
+>>>>>>> a2cfc93cd629812c93d82958de50eb5be706c3d5
 
 /* default event listeners */
 $("#play-btn").on('click', () => {
