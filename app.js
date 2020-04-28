@@ -9,10 +9,7 @@ const handlebars = require('express-handlebars');
 const path = require('path'); // Path module.
 const bodyParser = require('body-parser');
 const uuidv4 = require('uuid/v4');
-<<<<<<< HEAD
 const cookieParser = require('cookie-parser');
-=======
->>>>>>> a2cfc93cd629812c93d82958de50eb5be706c3d5
 
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -98,11 +95,7 @@ const handleImport = (socket, importLink) => {
                             'name': songName,
                             'artist': artistName,
                             'uuid': uuid,
-<<<<<<< HEAD
                             'location': `songs/imports/${socket.id}/${uuid}.mp3`
-=======
-                            'location': `songs/imports/${uuid}.mp3`
->>>>>>> a2cfc93cd629812c93d82958de50eb5be706c3d5
                         }
                         socket.emit('done-importing', JSON.stringify(resposneObj));
                         return;
@@ -111,11 +104,7 @@ const handleImport = (socket, importLink) => {
                         socket.emit('task-failed', 'Error converting to MP3');
                         console.log('An error occurred' + err.message);
                     })
-<<<<<<< HEAD
                     .pipe(fs.createWriteStream(`views/songs/imports/${socket.id}/${uuid}.mp3`));
-=======
-                    .pipe(fs.createWriteStream(`views/songs/imports/${uuid}.mp3`));
->>>>>>> a2cfc93cd629812c93d82958de50eb5be706c3d5
             })
             video.on('error', function error(err) {
                 socket.emit('dismiss-success-snackbars');

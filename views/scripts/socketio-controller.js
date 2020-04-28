@@ -22,29 +22,16 @@ socket.on('done-importing', (data) => {
     let response = JSON.parse(data);
     let songItem = {
         'index': songs.length,
-<<<<<<< HEAD
         'name': (response.name)?response.name:"",
         'artist': (response.artist)?response.artist:"",
         'location': response.location,
         'uuid': response.uuid,
         'sound': ""
-=======
-        'name': response.name.substring(response.name.indexOf('-') + 1),
-        'artist': response.artist,
-        'location': response.location,
-        'uuid': response.uuid
->>>>>>> a2cfc93cd629812c93d82958de50eb5be706c3d5
     }
     songs.push(songItem);
 
     // push new song item to the DOM song list modal
-<<<<<<< HEAD
     SongListModal.append(songItem);
-=======
-    let artist = (songItem.artist)?songItem.artist:"";
-    let name = (songItem.name)?songItem.name:"";
-    let uuid = songItem.uuid;
->>>>>>> a2cfc93cd629812c93d82958de50eb5be706c3d5
 
     // initiate p5 if this is the first song. Only need to do this upon the first song loading.
     if (songs.length == 1) {
