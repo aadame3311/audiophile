@@ -130,7 +130,6 @@ soundFunctions = (myp5) => {
         }, 100)
     }
 
-<<<<<<< HEAD
     /* meant to be used to store the sound object for a specific song.
          this way the song can be played on demand without needing to be loaded every time. */
     initSoundFile = (songId="") => {
@@ -142,33 +141,6 @@ soundFunctions = (myp5) => {
     setSongDetails = (song) => {
         const songNameContainer = document.getElementById('song-name');
         const artistNameContainer = document.getElementById('artist-name');
-=======
-    //
-    loadSong = (songId="", playSong) => {
-        console.log('loading song');
-        // Set display song name and artist
-        const songNameContainer = document.getElementById('song-name');
-        const artistNameContainer = document.getElementById('artist-name');
-        songNameContainer.textContent = songs[songIndex].name;
-        artistNameContainer.textContent = songs[songIndex].artist;
-
-        // load by songId, else by current index
-        if (songId != "") {
-            var songToLoad = songs.find(song => song.uuid == songId);
-            songIndex = songToLoad.index;
-        } else {
-            var songToLoad = songs[songIndex];
-        }
-        
-        sound = myp5.loadSound(songToLoad.location, () => {
-            if (playSong) {
-                sound.play();
-                setPauseIcon();
-            } else {
-                sound.pause();
-                setPlayIcon();
-            }
->>>>>>> a2cfc93cd629812c93d82958de50eb5be706c3d5
 
         songNameContainer.textContent = song.name;
         artistNameContainer.textContent = song.artist;

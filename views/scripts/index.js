@@ -58,22 +58,12 @@ settingsBtn.addEventListener('click', () => {
 });
 mySongsBtn.addEventListener('click', (e) => {
     e.preventDefault();
-<<<<<<< HEAD
     SongListModal.toggle();
 });
 $("#modal-exit-icon").click((e) => {
     e.preventDefault();
     SongListModal.hide();
 });
-=======
-    if (songListModalContainer.css("display") == "block") {
-        songListModalContainer.css("display", "none");
-    } else {
-        songListModalContainer.css("display", "block");
-    }
-    //songListModalContainer.prop('hidden', !songListModalContainer.prop('hidden'))
-}
->>>>>>> a2cfc93cd629812c93d82958de50eb5be706c3d5
 
 // add event listeners to change theme when clicking on theme selectors
 const addThemeChangeEventListeners = () => {
