@@ -11,14 +11,22 @@ let canPlayorPause = false;
 
 let songSkipped = false;
 let playToggled = false;
+let alreadyStopped = false; // Prevents infinite callstack when a song ends
 
 const pauseSong = (songToPause) => {
+    console.log('song paused');
+    songToPause.sound.pause();
+    return;
+
     promise = new Promise((resolve, reject) => {
+        console.log('promise promise');
         songToPause.sound.pause();
         resolve('success');
     });
     promise.then(()=> {
-        console.log('song was ended');
+        //console.log('song was ended');
+        songToPause.sound
+        playToggled = false;
     })
 }
 const playSong = (songToPlay) => {
@@ -28,29 +36,25 @@ const playSong = (songToPlay) => {
     });
     promise.then(()=> {
         console.log('song is playing');
+        playToggled = false;
     })
 }
 
 soundFunctions = (myp5) => {
     const handleEnd = () => {
-        console.log('song ENDED:');
-        // should only trigger this when the song ends (not skipped)
-        if (!songSkipped && playToggled==false) {
-            console.log('song ended naturally', playToggled);
-            skipSong('forward');
-        }
-    
-        songSkipped = false;
-        playToggled = false;
+        skipSong('forward');
     }
 
     // Event listeners
     playBtn.addEventListener('click', () => {
+        playToggled = true;
         if (sound.isLoaded()) {
             togglePlay();
         }
     });
-    $("songitem-play-icon").click(()=>{
+    $(".songitem-play-icon").click(()=>{
+        console.log('selected from list');
+        playToggled = true;
         if (sound.isLoaded()) {
             togglePlay();
         }
@@ -69,6 +73,7 @@ soundFunctions = (myp5) => {
     });
 
     // Helper functions for events and overwrites on index.js
+
     const setPauseIcon = () => {
         // for main player controls
         playBtnIcon.classList.remove('fa-play');
@@ -107,22 +112,29 @@ soundFunctions = (myp5) => {
             setPlayIcon();
         }
     }
+    const setStop = () => {
+        alreadyStopped = true;
+        setPlayIcon();
+        if (!currentSongPlaying.sound.isPaused()) {
+            console.log('stopping song: ', currentSongPlaying.index);
+            currentSongPlaying.sound.stop();
+        }
+    }
     // provides fine tuned control for playing a song manually.
     const setPlay = () => {
+        alreadyStopped = false;
+
         if (!currentSongPlaying.sound.isPlaying()) {
             playSong(currentSongPlaying);
             setPauseIcon();
         }
     }
     const skipSong = direction => {
-        //songSkipped = true;
-        setPause();
-        //songSkipped = true;
-        currentSongPlaying.sound.stop();
+        setStop();
 
         switch (direction) {
             case 'forward':
-                // reset song index when exceeding songs length
+                // reset to 0 when limit reached
                 if (++songIndex >= songs.length) {
                     songIndex = 0;
                 }
@@ -135,7 +147,7 @@ soundFunctions = (myp5) => {
                 break;
         }
 
-        loadSong("", "index");
+        loadSong("", "index", true);
     }
     const resetBrightness = () => {
         const resetBrightnessInterval = setInterval(() => {
@@ -181,19 +193,21 @@ soundFunctions = (myp5) => {
     }
     // used when loading a song from init (when imported)
     loadSong = (songId="", loadMethod, playSong=true) => {
-        // Get song depending on method specified.
-        songToLoad = getSong(songId, loadMethod);
+        console.log('loading song');
+        alreadyStopped = false;
 
+        // If there is a song playing when a new one gets loaded, stop that song from playing.
+        if (currentSongPlaying != null && currentSongPlaying.sound.isPlaying()) {
+            setStop();
+        }
+
+        songToLoad = getSong(songId, loadMethod);
         songToLoad.sound.onended(() => {
-            handleEnd();
+            if (!alreadyStopped && !currentSongPlaying.sound.isPaused()) {
+                handleEnd();
+            }
         });
 
-        // only run onupdate
-        if (currentSongPlaying != null && currentSongPlaying.sound.isPlaying()) {
-            setPause();
-            currentSongPlaying.sound.onended(() => {console.log('song ended without event')});
-            currentSongPlaying.sound.stop();
-        } 
         currentSongPlaying = songToLoad;
         currentSongId = songToLoad.uuid;
 
@@ -205,14 +219,13 @@ soundFunctions = (myp5) => {
     // used when selecting a song from a song list.
     selectSong = (songId="", loadMethod) => {
         selectedSong = getSong(songId, loadMethod);
-
+        songIndex = selectedSong.index;
         // when selecting a new song from the list.
         if (currentSongId != null && songId != currentSongId) {
-            setPause(); // pause previous song
-            //currentSongPlaying.sound.onended(() => {})
-            currentSongPlaying.sound.onended(() => {console.log('song ended without event')});
-            currentSongPlaying.sound.stop();
-
+            if (currentSongPlaying.sound.isPlaying()){
+                console.log('stopping prev');
+                setStop();
+            }
             currentSongId = songId;
             currentSongPlaying = selectedSong;
             setPlay();
