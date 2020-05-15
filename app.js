@@ -68,11 +68,17 @@ const handleImport = (socket, importLink) => {
             const video = youtubedl(importLink, { filter: format => format.container === 'mp4' });
 
             video.on('info', function(info) {
-                console.log('starting import');
                 // emit error if file is too large.
-                if (info.size > 30000000) {
+                let formats =  info.player_response.streamingData.formats
+                let videoDurationMs = formats[0].approxDurationMs;
+                let logString = "import started\n";
+                logString += `song name: ${info.player_response.videoDetails.title}\n`;
+                logString += `video duration: ${videoDurationMs}`
+
+                // resitrict videos longer than 10min.
+                if (videoDurationMs > 600000) {
                     socket.emit('dismiss-success-snackbars');
-                    socket.emit('task-failed', "File size is over 30MB");
+                    socket.emit('task-failed', "Only videos no longer than 10 min :(");
                     
                     return;
                 }
@@ -80,6 +86,8 @@ const handleImport = (socket, importLink) => {
 
                 songName = info.player_response.videoDetails.title;
                 artistName = info.author.name;
+
+                console.log(logString);
             });
             video.on('end', () => {
                 socket.emit('task-update', 'Processing');
@@ -101,7 +109,7 @@ const handleImport = (socket, importLink) => {
                         return;
                     })
                     .on('error', (err) => {
-                        socket.emit('task-failed', 'Error converting to MP3');
+                        socket.emit('task-failed', 'Error importing');
                         console.log('An error occurred' + err.message);
                     })
                     .pipe(fs.createWriteStream(`views/songs/imports/${socket.id}/${uuid}.mp3`));

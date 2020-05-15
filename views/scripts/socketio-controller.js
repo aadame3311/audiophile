@@ -36,9 +36,6 @@ socket.on('done-importing', (data) => {
     // initiate p5 if this is the first song. Only need to do this upon the first song loading.
     if (songs.length == 1) {
         let myp5 = new p5(soundFunctions);
-
-        let DOMSongItem = $(`<div id='${uuid}' class='song-item'> <div onclick="loadSong('${uuid}', true)">PLAY</div> <span class="song-name">${name}</span> <span class="song-artist">${artist}</span></div>`)
-        DOMSongListItems.append(DOMSongItem);
     }
 
     songs[songs.length-1].sound = initSoundFile(songs[songs.length-1].uuid);

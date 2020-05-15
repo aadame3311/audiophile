@@ -39,9 +39,12 @@
 #modal-exit-icon:hover {
     filter: brightness(0.75);
     cursor: pointer;
+    margin-bottom: 0 !important;
 }
 
-
+.modal-title h1 {
+    font-weight: 100;
+}
 .modal-body {
     width: 100%;
     max-height: 400px;
@@ -50,7 +53,7 @@
 }
 .song-list {
     display: flex;
-    margin: 20px;
+    margin: 0 20px 20px 20px;
     flex-direction: column;
 }
 .song-item {
@@ -87,7 +90,7 @@
 
 #songlist-modal.theme-green {
     background-color: rgb(148, 211, 172);
-    color: black;
+    color: whitesmoke;
 }
 #songlist-modal.theme-purple {
     background-color: rgb(124, 100, 143);

@@ -7,14 +7,43 @@ let volume = 0.5;
 let prevAmpLevel = 0;
 let songIndex = 0;
 
-let canSkip = true; // prevents/allows user from skipping
 let canPlayorPause = false;
 
 let songSkipped = false;
+let playToggled = false;
 
+const pauseSong = (songToPause) => {
+    promise = new Promise((resolve, reject) => {
+        songToPause.sound.pause();
+        resolve('success');
+    });
+    promise.then(()=> {
+        console.log('song was ended');
+    })
+}
+const playSong = (songToPlay) => {
+    promise = new Promise((resolve, reject) => {
+        songToPlay.sound.play();
+        resolve('success');
+    });
+    promise.then(()=> {
+        console.log('song is playing');
+    })
+}
 
 soundFunctions = (myp5) => {
+    const handleEnd = () => {
+        console.log('song ENDED:');
+        // should only trigger this when the song ends (not skipped)
+        if (!songSkipped && playToggled==false) {
+            console.log('song ended naturally', playToggled);
+            skipSong('forward');
+        }
     
+        songSkipped = false;
+        playToggled = false;
+    }
+
     // Event listeners
     playBtn.addEventListener('click', () => {
         if (sound.isLoaded()) {
@@ -60,65 +89,53 @@ soundFunctions = (myp5) => {
         //document.getElementById(songId).
     }
     const togglePlay = () => {
+        playToggled = true;
+
         if (currentSongPlaying.sound.isPlaying()) {
-            currentSongPlaying.sound.pause();
+            pauseSong(currentSongPlaying);
             setPlayIcon();
 
         } else {
-            currentSongPlaying.sound.play();
+            playSong(currentSongPlaying);
             setPauseIcon();
         }
     }
     // provides fine tuned control for pausing a song manually.
     const setPause = () => {
         if (currentSongPlaying.sound.isPlaying()) {
-            currentSongPlaying.sound.pause();
+            pauseSong(currentSongPlaying);
             setPlayIcon();
         }
     }
     // provides fine tuned control for playing a song manually.
     const setPlay = () => {
         if (!currentSongPlaying.sound.isPlaying()) {
-            currentSongPlaying.sound.play();
+            playSong(currentSongPlaying);
             setPauseIcon();
         }
     }
-    /* Helps control when the user can't or can perform player actions (such as skip or play).
-        This sort of 'regulation' helps with issues when a song hasn't loaded yet but user 
-        wants to skip. This caused a bug where we would have 2 songs playing at once, once the
-        the previous loadSound() action caught up to the new one. */
-    const togglePlayerActions = () => {
-        canSkip = !canSkip;
-        canPlayorPause = !canPlayorPause;
-    }
     const skipSong = direction => {
-        // Update index and get rid of previous song
-        //sound.stop();
-        if (canSkip) {
-            //togglePlayerActions();
-            setPause();
-            currentSongPlaying.sound.stop();
+        //songSkipped = true;
+        setPause();
+        //songSkipped = true;
+        currentSongPlaying.sound.stop();
 
-            switch (direction) {
-                case 'forward':
-                    // reset song index when exceeding songs length
-                    if (++songIndex >= songs.length) {
-                        songIndex = 0;
-                    }
-                    break;
-                case 'backward':
-                    // set to last index if at first index
-                    if (--songIndex < 0) {
-                        songIndex = songs.length - 1;
-                    }
-                    break;
-            }
-
-            loadSong("", "index");
-            // loadSong(getSong("", "index").sound.id, "index", true);
+        switch (direction) {
+            case 'forward':
+                // reset song index when exceeding songs length
+                if (++songIndex >= songs.length) {
+                    songIndex = 0;
+                }
+                break;
+            case 'backward':
+                // set to last index if at first index
+                if (--songIndex < 0) {
+                    songIndex = songs.length - 1;
+                }
+                break;
         }
 
-        songSkipped = false;
+        loadSong("", "index");
     }
     const resetBrightness = () => {
         const resetBrightnessInterval = setInterval(() => {
@@ -168,16 +185,12 @@ soundFunctions = (myp5) => {
         songToLoad = getSong(songId, loadMethod);
 
         songToLoad.sound.onended(() => {
-            // should only trigger this when the song ends (not skipped)
-            if (!songSkipped && songToLoad.sound.isPlaying() && loadMethod != "list") {
-                skipSong('foward');
-            }
+            handleEnd();
         });
 
         // only run onupdate
         if (currentSongPlaying != null && currentSongPlaying.sound.isPlaying()) {
             setPause();
-            console.log('pausing current song');
             currentSongPlaying.sound.onended(() => {console.log('song ended without event')});
             currentSongPlaying.sound.stop();
         } 
@@ -196,6 +209,7 @@ soundFunctions = (myp5) => {
         // when selecting a new song from the list.
         if (currentSongId != null && songId != currentSongId) {
             setPause(); // pause previous song
+            //currentSongPlaying.sound.onended(() => {})
             currentSongPlaying.sound.onended(() => {console.log('song ended without event')});
             currentSongPlaying.sound.stop();
 
@@ -205,6 +219,7 @@ soundFunctions = (myp5) => {
         } 
         // when toggling play for the same song.
         else if (currentSongId != null && songId == currentSongId) {
+            console.log('toggling list');
             togglePlay();
         } 
 
