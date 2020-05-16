@@ -19,7 +19,13 @@ let currentSongPlaying, currentSongId;
 
             let myp5 = new p5(soundFunctions);
 
-            // append all songs to songlist modal
+            // append all songs to songlist 
+            if (songs.length == 0) {
+                $("#player").show();
+                $(".loading-icon").hide();
+                $(".song-list").show();
+                console.log('all songs loaded');
+            }
             songs.forEach((song)=> {
                 SongListModal.append(song);
                 song.sound = initSoundFile(song.uuid, ()=>{
