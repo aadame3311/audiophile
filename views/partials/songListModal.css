@@ -78,7 +78,13 @@
 .songitem-play-icon:hover {
     filter: brightness(0.75);
 }
-
+.trash-icon-container {
+    margin-left: auto;
+    margin-right: 15px;
+}
+.trash-icon-container:hover {
+    color: red;
+}
 .song-artist {
     font-size: 10px;
 }

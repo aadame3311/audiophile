@@ -26,6 +26,7 @@ socket.on('done-importing', (data) => {
         'artist': (response.artist)?response.artist:"",
         'location': response.location,
         'uuid': response.uuid,
+        'socketid': response.socketid,
         'sound': ""
     }
     songs.push(songItem);
@@ -35,7 +36,11 @@ socket.on('done-importing', (data) => {
 
     // initiate p5 if this is the first song. Only need to do this upon the first song loading.
     if (songs.length == 1) {
-        let myp5 = new p5(soundFunctions);
+        // Prevent from being initialized more than once,
+        // this can happen when deleting all songs, then adding more
+        if (typeof myp5 == "undefined") {
+            var myp5 = new p5(soundFunctions);
+        }
     }
 
     songs[songs.length-1].sound = initSoundFile(songs[songs.length-1].uuid);

@@ -4,6 +4,7 @@
 let brightnessMultiplier = 1;
 let volume = 0.5;
 
+
 let prevAmpLevel = 0;
 let songIndex = 0;
 
@@ -14,20 +15,9 @@ let playToggled = false;
 let alreadyStopped = false; // Prevents infinite callstack when a song ends
 
 const pauseSong = (songToPause) => {
-    console.log('song paused');
+     
     songToPause.sound.pause();
     return;
-
-    promise = new Promise((resolve, reject) => {
-        console.log('promise promise');
-        songToPause.sound.pause();
-        resolve('success');
-    });
-    promise.then(()=> {
-        //console.log('song was ended');
-        songToPause.sound
-        playToggled = false;
-    })
 }
 const playSong = (songToPlay) => {
     promise = new Promise((resolve, reject) => {
@@ -35,9 +25,10 @@ const playSong = (songToPlay) => {
         resolve('success');
     });
     promise.then(()=> {
-        console.log('song is playing');
+         
         playToggled = false;
     })
+    
 }
 
 soundFunctions = (myp5) => {
@@ -46,19 +37,13 @@ soundFunctions = (myp5) => {
     }
 
     // Event listeners
-    playBtn.addEventListener('click', () => {
-        playToggled = true;
-        if (sound.isLoaded()) {
-            togglePlay();
-        }
+    $(playBtn).unbind();
+    $(nextTrackBtn).unbind();
+    $(prevTrackBtn).unbind();
+
+    $(playBtn).on('click', () => {
+        togglePlay();
     });
-    $(".songitem-play-icon").click(()=>{
-        console.log('selected from list');
-        playToggled = true;
-        if (sound.isLoaded()) {
-            togglePlay();
-        }
-    })
     nextTrackBtn.addEventListener('click', () => {
         songSkipped = true;
         if (songs.length > 1) {
@@ -94,6 +79,7 @@ soundFunctions = (myp5) => {
         //document.getElementById(songId).
     }
     const togglePlay = () => {
+         
         playToggled = true;
 
         if (currentSongPlaying.sound.isPlaying()) {
@@ -116,7 +102,7 @@ soundFunctions = (myp5) => {
         alreadyStopped = true;
         setPlayIcon();
         if (!currentSongPlaying.sound.isPaused()) {
-            console.log('stopping song: ', currentSongPlaying.index);
+             
             currentSongPlaying.sound.stop();
         }
     }
@@ -130,24 +116,26 @@ soundFunctions = (myp5) => {
         }
     }
     const skipSong = direction => {
-        setStop();
+        if (songs.length > 0) {
+            setStop();
 
-        switch (direction) {
-            case 'forward':
-                // reset to 0 when limit reached
-                if (++songIndex >= songs.length) {
-                    songIndex = 0;
-                }
-                break;
-            case 'backward':
-                // set to last index if at first index
-                if (--songIndex < 0) {
-                    songIndex = songs.length - 1;
-                }
-                break;
+            switch (direction) {
+                case 'forward':
+                    // reset to 0 when limit reached
+                    if (++songIndex >= songs.length) {
+                        songIndex = 0;
+                    }
+                    break;
+                case 'backward':
+                    // set to last index if at first index
+                    if (--songIndex < 0) {
+                        songIndex = songs.length - 1;
+                    }
+                    break;
+            }
+
+            loadSong("", "index", true);
         }
-
-        loadSong("", "index", true);
     }
     const resetBrightness = () => {
         const resetBrightnessInterval = setInterval(() => {
@@ -159,10 +147,11 @@ soundFunctions = (myp5) => {
         }, 100)
     }
 
+
     /* meant to be used to store the sound object for a specific song.
          this way the song can be played on demand without needing to be loaded every time. */
     initSoundFile = (songId="") => {
-        console.log("initiating sound file");
+         
         var songToLoad = songs.find(song => song.uuid == songId);
         return myp5.loadSound(songToLoad.location, () => loadSong(songId, "list", false));
     }
@@ -174,6 +163,45 @@ soundFunctions = (myp5) => {
         songNameContainer.textContent = song.name;
         artistNameContainer.textContent = song.artist;
     }
+    // Resets song and artist name in the player to whichever song is currently playing
+    const resetPlayerDisplay = () => {
+        const songNameContainer = document.getElementById('song-name');
+        const artistNameContainer = document.getElementById('artist-name');
+
+        songNameContainer.textContent = (currentSongPlaying != null && currentSongPlaying.name)?currentSongPlaying.name:"";
+        artistNameContainer.textContent = (currentSongPlaying != null && currentSongPlaying.artist)?currentSongPlaying.artist:"";
+    }
+
+    removeSong = songId => {
+        var songToDelete = songs.find(song => song.uuid == songId);
+        setStop();
+        // Remove song from local list
+        songs.splice(songToDelete.index, 1);
+
+        // Reset song indices
+        songs.forEach((song, i)=>{
+            song.index = i;
+        });
+
+        if (songs.length == 0) {
+            currentSongPlaying = null;
+            resetPlayerDisplay();
+        }
+        else {
+            skipSong("forward");
+            setPause();
+            resetPlayerDisplay();
+        }
+
+        // Update list on local storage
+        localStorage.setItem("userSongs", songs);
+        // Send message to backend so we can delete the sound file from src.
+        socket.emit('RemoveSong', songToDelete);
+        // Removes from the playlist modal view
+        SongListModal.remove(songId);
+    }
+
+
     getSong = (songId="", loadMethod) => {
         switch(loadMethod) {
             case "list":
@@ -188,12 +216,11 @@ soundFunctions = (myp5) => {
         }
 
         setSongDetails(songToLoad);
-        sound = songToLoad.sound;
         return songToLoad;
     }
     // used when loading a song from init (when imported)
     loadSong = (songId="", loadMethod, playSong=true) => {
-        console.log('loading song');
+         
         alreadyStopped = false;
 
         // If there is a song playing when a new one gets loaded, stop that song from playing.
@@ -203,8 +230,11 @@ soundFunctions = (myp5) => {
 
         songToLoad = getSong(songId, loadMethod);
         songToLoad.sound.onended(() => {
-            if (!alreadyStopped && !currentSongPlaying.sound.isPaused()) {
-                handleEnd();
+             
+            if (songs.length > 0) {
+                if (!alreadyStopped && !currentSongPlaying.sound.isPaused()) {
+                    handleEnd();
+                }
             }
         });
 
@@ -216,6 +246,7 @@ soundFunctions = (myp5) => {
 
         (playSong)?setPlay():setPause();
     }
+
     // used when selecting a song from a song list.
     selectSong = (songId="", loadMethod) => {
         selectedSong = getSong(songId, loadMethod);
@@ -223,16 +254,16 @@ soundFunctions = (myp5) => {
         // when selecting a new song from the list.
         if (currentSongId != null && songId != currentSongId) {
             if (currentSongPlaying.sound.isPlaying()){
-                console.log('stopping prev');
+                 
                 setStop();
             }
             currentSongId = songId;
             currentSongPlaying = selectedSong;
-            setPlay();
+            togglePlay();
         } 
         // when toggling play for the same song.
         else if (currentSongId != null && songId == currentSongId) {
-            console.log('toggling list');
+             
             togglePlay();
         } 
 

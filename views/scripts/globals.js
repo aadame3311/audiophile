@@ -3,7 +3,7 @@ let songs = [];
 let socket = io();
 let snackbarTimeout;
 let soundFunctions;
-let loadSong, initSoundFile, setSongDetails, selectSong;
+let loadSong, initSoundFile, setSongDetails, selectSong, removeSong;
 let currentSongPlaying, currentSongId;
 
 (function onInit() {

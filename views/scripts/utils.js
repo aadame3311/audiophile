@@ -27,7 +27,14 @@ class SongListModal {
     }
     static append(songItem) {
         // push new song item to the DOM song list modal
-        let DOMSongItem = $(`<div id='${songItem.uuid}' class='song-item'> <div onclick="selectSong('${songItem.uuid}', 'list')"> <i class="songitem-play-icon fas fa-play fa-lg"></i></div> <div class="song-item-contents"> <span class="song-name">${songItem.name}</span> <span class="song-artist">${songItem.artist}</span></div></div>`)
+        let DOMSongItem = $(`<div id='${songItem.uuid}' class='song-item'> <div onclick="selectSong('${songItem.uuid}', 'list')">`+
+            `<i class="songitem-play-icon fas fa-play fa-lg"></i></div> <div class="song-item-contents">`+
+            `<span class="song-name">${songItem.name}</span> <span class="song-artist">${songItem.artist}</span></div>`+
+            `<div class="trash-icon-container" onclick="removeSong('${songItem.uuid}', 'list')"> <i class="fas fa-trash"></i></div></div>`)
         $(".song-list").append(DOMSongItem);
+    }
+    static remove(songId) {
+        console.log(`removing ${songId}`)
+        $(`#${songId}`).remove();
     }
 } 

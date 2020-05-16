@@ -103,6 +103,7 @@ const handleImport = (socket, importLink) => {
                             'name': songName,
                             'artist': artistName,
                             'uuid': uuid,
+                            'socketid': socket.id,
                             'location': `songs/imports/${socket.id}/${uuid}.mp3`
                         }
                         socket.emit('done-importing', JSON.stringify(resposneObj));
@@ -145,6 +146,23 @@ io.on('connection', (socket) => {
     socket.on('task[import]-started', (importLink) => {
         handleImport(socket, importLink);
     });
+    socket.on("RemoveSong", (song)=>{
+        var containingFolder = song.socketid;
+        var filename = song.uuid;
+        console.log('removing song');
+        try {
+            fs.unlink(`views/songs/imports/${containingFolder}/${filename}.mp3`, (err)=>{
+                console.log(err);
+                fs.rmdir(`views/songs/imports/${containingFolder}`, (err)=>{
+                    console.log(err);
+                });
+            });
+
+        }
+        catch(ex) {
+            console.log(ex);
+        }
+    })
 });
 
 http.listen(port, () => console.log(`Example app running on ${port}`));

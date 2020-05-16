@@ -17,8 +17,8 @@ volumeDisplayValue.textContent = volumeSlider.value;
 volumeSlider.oninput = () => {
     let volumeValue = volumeSlider.value / 100; // 0 (silent) to 1 (full volume)
     volumeDisplayValue.textContent = volumeSlider.value;
-    if (sound != null) {
-        sound.setVolume(volumeValue)
+    if (currentSongPlaying.sound != null) {
+        currentSongPlaying.sound.setVolume(volumeValue)
     }
 }
 
@@ -72,7 +72,7 @@ const addThemeChangeEventListeners = () => {
         // the color attributes are set in custom attributes in each theme selector DOM object
         let currThemeSelector = themeSelectors[i];
         themeSelectors[i].addEventListener('click', () => {
-            console.log('change theme');
+             
             selectedThemeColor = {
                 name: currThemeSelector.getAttribute('color-name'),
                 primary: currThemeSelector.getAttribute('primary').split(','),
