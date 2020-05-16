@@ -9,15 +9,31 @@ let currentSongPlaying, currentSongId;
 (function onInit() {
     //localStorage.clear();
     $(document).ready(() => {
+        $("#player").hide();
+        $(".loading-icon").show();
+        $(".song-list").hide();
+
         if (localStorage.getItem("userSongs")) {
             songs = JSON.parse(localStorage.getItem("userSongs"));
+            let initCount = 0;
 
             let myp5 = new p5(soundFunctions);
 
             // append all songs to songlist modal
             songs.forEach((song)=> {
                 SongListModal.append(song);
-                song.sound = initSoundFile(song.uuid);
+                song.sound = initSoundFile(song.uuid, ()=>{
+                    initCount++;
+                    console.log(`initCount`, initCount);
+                    if (initCount >= songs.length) {
+                        $("#player").show();
+                        $(".loading-icon").hide();
+                        $(".song-list").show();
+                        console.log('all songs loaded');
+                    }
+                });
+
+
             });
         }
         console.log(`userSongs: ${songs.length}`);
@@ -27,7 +43,6 @@ let currentSongPlaying, currentSongId;
 /* default event listeners */
 $("#play-btn").on('click', () => {
     if (songs.length == 0) {
-        dismissSnackbars('success');
         dismissSnackbars('error');
         SnackBar.create({
             type: 'info',
@@ -38,7 +53,6 @@ $("#play-btn").on('click', () => {
 })
 $("#previous-track").on('click', () => {
     if (songs.length <= 1) {
-        dismissSnackbars('success');
         dismissSnackbars('error');
         SnackBar.create({
             type: 'info',
@@ -49,7 +63,6 @@ $("#previous-track").on('click', () => {
 })
 $("#next-track").on('click', () => {
     if (songs.length <= 1) {
-        dismissSnackbars('success');
         dismissSnackbars('error');
         SnackBar.create({
             type: 'info',

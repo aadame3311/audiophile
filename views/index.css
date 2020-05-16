@@ -77,7 +77,14 @@ hr {
 .disabled-action {
     opacity: 0.50;
 }
+.loading-icon {
+    font-size: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
+}
 
 #player #song-info {
     text-align: center;

@@ -150,10 +150,13 @@ soundFunctions = (myp5) => {
 
     /* meant to be used to store the sound object for a specific song.
          this way the song can be played on demand without needing to be loaded every time. */
-    initSoundFile = (songId="") => {
+    initSoundFile = (songId="", callback) => {
          
         var songToLoad = songs.find(song => song.uuid == songId);
-        return myp5.loadSound(songToLoad.location, () => loadSong(songId, "list", false));
+        return myp5.loadSound(songToLoad.location, () => {
+            loadSong(songId, "list", false);
+            callback();
+        });
     }
     // Set display song name and artist
     setSongDetails = (song) => {

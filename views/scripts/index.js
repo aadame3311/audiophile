@@ -11,8 +11,9 @@ window.mobilecheck = function() {
 };
 window.mobilecheck();
 
+
 // set default volume
-volumeSlider.value = 10;
+volumeSlider.value = 25;
 volumeDisplayValue.textContent = volumeSlider.value;
 volumeSlider.oninput = () => {
     let volumeValue = volumeSlider.value / 100; // 0 (silent) to 1 (full volume)
