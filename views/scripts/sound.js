@@ -132,10 +132,20 @@ soundFunctions = (myp5) => {
     initSoundFile = (songId="", callback=()=>{}) => {
          
         var songToLoad = songs.find(song => song.uuid == songId);
-        return myp5.loadSound(songToLoad.location, () => {
+        var processedSound = myp5.loadSound(songToLoad.location, () => {
             loadSong(songId, "list", false);
-            callback();
+            if (typeof callback==='function'){
+                callback('success');
+            }
+        }, ()=>{
+            //error
+            if (typeof callback==='function') {
+                callback('error');
+            }            
         });
+
+        return processedSound;
+        
     }
     // Set display song name and artist
     setSongDetails = (song) => {

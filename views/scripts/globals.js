@@ -26,7 +26,8 @@ let currentSongPlaying, currentSongId;
 
             songs.forEach((song)=> {
                 SongListModal.append(song);
-                song.sound = initSoundFile(song.uuid, ()=>{
+                song.sound = initSoundFile(song.uuid, (res)=>{
+
                     initCount++;
                     console.log(`initCount`, initCount);
                     if (initCount >= songs.length) {
