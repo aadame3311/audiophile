@@ -137,8 +137,16 @@ soundFunctions = (myp5) => {
             if (typeof callback==='function'){
                 callback('success');
             }
-        }, ()=>{
-            //error
+        }, (err)=>{
+            // Remove song if file not found
+            var songToDelete = songs.find(song => song.uuid == songId);
+            songs.splice(songToDelete.index, 1);
+            songs.forEach((song, i)=>{
+                song.index = i;
+            });
+            localStorage.setItem("userSongs", songs);
+            SongListModal.remove(songId);
+    
             if (typeof callback==='function') {
                 callback('error');
             }            

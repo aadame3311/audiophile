@@ -12,19 +12,20 @@ let currentSongPlaying, currentSongId;
         $("#player").hide();
         $(".song-list").hide();
 
-        SnackBar.create({
-            type: 'success',
-            message: 'Loading Songs',
-            auto_dismiss: false
-        });
-
         if (localStorage.getItem("userSongs")) {
             songs = JSON.parse(localStorage.getItem("userSongs"));
             let initCount = 0;
 
             let myp5 = new p5(soundFunctions);
 
+            SnackBar.create({
+                type: 'success',
+                message: 'Loading Songs',
+                auto_dismiss: false
+            });
+    
             songs.forEach((song)=> {
+                
                 SongListModal.append(song);
                 song.sound = initSoundFile(song.uuid, (res)=>{
 
@@ -45,6 +46,8 @@ let currentSongPlaying, currentSongId;
             $("#player").show();
             $(".loading-icon").hide();
             $(".song-list").show();
+            dismissSnackbars('success');
+
             console.log('all songs loaded');
         }
     })

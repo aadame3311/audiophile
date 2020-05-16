@@ -9,6 +9,7 @@ function create_UUID(){
 }
 
 const dismissSnackbars = (type) => {
+    console.log('removing snackbar');
     $(`.snackbar-${type}`).removeClass("snackbar-show");
     $(`.snackbar-${type}`).addClass("snackbar-hide");
     setTimeout(()=>{

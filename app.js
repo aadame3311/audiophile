@@ -90,14 +90,13 @@ const handleImport = (socket, importLink) => {
                 console.log(logString);
             });
             video.on('end', () => {
-                socket.emit('task-update', 'Processing');
+                socket.emit('task-update', 'Processing (this might take a while)');
                 console.log('finished downloading');
                 // convert mp4 file to mp3.
                 ffmpeg('tmp/videotest.mp4')
                     .toFormat('mp3')
                     .on('end', () => {
                         socket.emit('task-update', 'Done');
-                        console.log("finished converting");
                         // send response with the route to the song
                         let resposneObj = {
                             'name': songName,
