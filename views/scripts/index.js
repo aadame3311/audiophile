@@ -12,6 +12,48 @@ window.mobilecheck = function() {
 window.mobilecheck();
 
 
+    $(playBtn).on('click', () => {
+        if (songs.length == 0) {
+            dismissSnackbars('error');
+            SnackBar.create({
+                type: 'info',
+                message: '&#128712; ' + "Please import songs via the settings menu" + ' &#128712;',
+                auto_dismiss: true
+            });
+        }
+        else {
+            togglePlay();
+        }
+    });
+    nextTrackBtn.addEventListener('click', () => {
+        if (songs.length <= 1) {
+            dismissSnackbars('error');
+            SnackBar.create({
+                type: 'info',
+                message: '&#128712; ' + "Please import more songs via the settings menu" + ' &#128712;',
+                auto_dismiss: true
+            });
+        }
+        else {
+            songSkipped = true;
+            skipSong('forward');
+        }
+    });
+    prevTrackBtn.addEventListener('click', () => {
+        if (songs.length <= 1) {
+            dismissSnackbars('error');
+            SnackBar.create({
+                type: 'info',
+                message: '&#128712; ' + "Please import more songs via the settings menu" + ' &#128712;',
+                auto_dismiss: true
+            });
+        }
+        else {
+            songSkipped = true;
+            skipSong('backward');
+        }
+    });
+
 // set default volume
 volumeSlider.value = 25;
 volumeDisplayValue.textContent = volumeSlider.value;

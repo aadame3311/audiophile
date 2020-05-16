@@ -8,6 +8,51 @@ function create_UUID(){
     return uuid;
 }
 
+const dismissSnackbars = (type) => {
+    $(`.snackbar-${type}`).removeClass("snackbar-show");
+    $(`.snackbar-${type}`).addClass("snackbar-hide");
+    setTimeout(()=>{
+        $(`.snackbar-${type}`).remove();
+    }, 500);
+}
+
+class SnackBar {
+    static on = (event, callback) => {
+        if (typeof callback == 'function') {
+            switch(event) {
+                case 'error-snackbar-dismissed':
+                    addEventListener('error-snackbar-dismissed', callback);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    static create = (options, callback = () => {}) => {
+        const snackbarDOM = $(`<div class='snackbar snackbar-${options.uuid} snackbar-${options.type}'>${options.message}</div>`);
+        const $body = $("#body");
+
+        $body.append(snackbarDOM);
+        snackbarDOM.addClass('snackbar-show');
+
+        if (options.auto_dismiss) {
+            setTimeout(() => {
+                $(`.snackbar-${options.uuid}`).removeClass('snackbar-show');
+                $(`.snackbar-${options.uuid}`).addClass('snackbar-hide');
+                
+                setTimeout(()=>{
+                    $(`.snackbar-${options.uuid}`).remove();
+                    dispatchEvent(new Event(`${options.type}-snackbar-dismissed`));
+                }, 500)
+            }, 4000);
+        }
+    
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }       
+}
+
 class SongListModal {
     static show() {
         $("#songlist-container").css("display", "block");

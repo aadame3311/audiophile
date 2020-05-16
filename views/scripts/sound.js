@@ -36,27 +36,6 @@ soundFunctions = (myp5) => {
         skipSong('forward');
     }
 
-    // Event listeners
-    $(playBtn).unbind();
-    $(nextTrackBtn).unbind();
-    $(prevTrackBtn).unbind();
-
-    $(playBtn).on('click', () => {
-        togglePlay();
-    });
-    nextTrackBtn.addEventListener('click', () => {
-        songSkipped = true;
-        if (songs.length > 1) {
-            skipSong('forward');
-        }
-    });
-    prevTrackBtn.addEventListener('click', () => {
-        songSkipped = true;
-        if (songs.length > 1) {
-            skipSong('backward');
-        }
-    });
-
     // Helper functions for events and overwrites on index.js
 
     const setPauseIcon = () => {
@@ -150,7 +129,7 @@ soundFunctions = (myp5) => {
 
     /* meant to be used to store the sound object for a specific song.
          this way the song can be played on demand without needing to be loaded every time. */
-    initSoundFile = (songId="", callback) => {
+    initSoundFile = (songId="", callback=()=>{}) => {
          
         var songToLoad = songs.find(song => song.uuid == songId);
         return myp5.loadSound(songToLoad.location, () => {

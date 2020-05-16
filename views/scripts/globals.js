@@ -10,8 +10,13 @@ let currentSongPlaying, currentSongId;
     //localStorage.clear();
     $(document).ready(() => {
         $("#player").hide();
-        $(".loading-icon").show();
         $(".song-list").hide();
+
+        SnackBar.create({
+            type: 'success',
+            message: 'Loading Songs',
+            auto_dismiss: false
+        });
 
         if (localStorage.getItem("userSongs")) {
             songs = JSON.parse(localStorage.getItem("userSongs"));
@@ -26,9 +31,9 @@ let currentSongPlaying, currentSongId;
                     console.log(`initCount`, initCount);
                     if (initCount >= songs.length) {
                         $("#player").show();
-                        $(".loading-icon").hide();
                         $(".song-list").show();
                         console.log('all songs loaded');
+                        dismissSnackbars('success');
                     }
                 });
 
@@ -43,39 +48,6 @@ let currentSongPlaying, currentSongId;
         }
     })
 })();
-
-/* default event listeners */
-$("#play-btn").on('click', () => {
-    if (songs.length == 0) {
-        dismissSnackbars('error');
-        SnackBar.create({
-            type: 'info',
-            message: '&#128712; ' + "Please import songs via the settings menu" + ' &#128712;',
-            auto_dismiss: true
-        });
-    }
-})
-$("#previous-track").on('click', () => {
-    if (songs.length <= 1) {
-        dismissSnackbars('error');
-        SnackBar.create({
-            type: 'info',
-            message: '&#128712; ' + "Please import more songs via the settings menu" + ' &#128712;',
-            auto_dismiss: true
-        });
-    }
-})
-$("#next-track").on('click', () => {
-    if (songs.length <= 1) {
-        dismissSnackbars('error');
-        SnackBar.create({
-            type: 'info',
-            message: '&#128712; ' + "Please import more songs via the settings menu" + ' &#128712;',
-            auto_dismiss: true
-        });
-    }
-})
-
 
 const drawProperties = {
     "rect": {
@@ -182,49 +154,4 @@ const artistName = document.getElementById("artist-name");
 
 const toggleErrorSnackbar = (options, callback = () => {}) => {
     
-}
-
-const dismissSnackbars = (type) => {
-    $(`.snackbar-${type}`).removeClass("snackbar-show");
-    $(`.snackbar-${type}`).addClass("snackbar-hide");
-    setTimeout(()=>{
-        $(`.snackbar-${type}`).remove();
-    }, 500);
-}
-
-class SnackBar {
-    static on = (event, callback) => {
-        if (typeof callback == 'function') {
-            switch(event) {
-                case 'error-snackbar-dismissed':
-                    addEventListener('error-snackbar-dismissed', callback);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    static create = (options, callback = () => {}) => {
-        const snackbarDOM = $(`<div class='snackbar snackbar-${options.uuid} snackbar-${options.type}'>${options.message}</div>`);
-        const $body = $("#body");
-
-        $body.append(snackbarDOM);
-        snackbarDOM.addClass('snackbar-show');
-
-        if (options.auto_dismiss) {
-            setTimeout(() => {
-                $(`.snackbar-${options.uuid}`).removeClass('snackbar-show');
-                $(`.snackbar-${options.uuid}`).addClass('snackbar-hide');
-                
-                setTimeout(()=>{
-                    $(`.snackbar-${options.uuid}`).remove();
-                    dispatchEvent(new Event(`${options.type}-snackbar-dismissed`));
-                }, 500)
-            }, 4000);
-        }
-    
-        if (typeof callback === 'function') {
-            callback();
-        }
-    }       
 }
