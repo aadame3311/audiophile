@@ -57,7 +57,7 @@ soundFunctions = (myp5) => {
         $(`#${currentSongId} div i`).addClass('fa-play');
         //document.getElementById(songId).
     }
-    const togglePlay = () => {
+    togglePlay = () => {
          
         playToggled = true;
 
