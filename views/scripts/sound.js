@@ -94,7 +94,7 @@ soundFunctions = (myp5) => {
             setPauseIcon();
         }
     }
-    const skipSong = direction => {
+    skipSong = direction => {
         if (songs.length > 0) {
             setStop();
 
