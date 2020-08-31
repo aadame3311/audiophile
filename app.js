@@ -8,7 +8,8 @@ const youtubedl = require('ytdl-core');
 const handlebars = require('express-handlebars');
 const path = require('path'); // Path module.
 const bodyParser = require('body-parser');
-const uuidv4 = require('uuid/v4');
+// required to be this way after uuid@7.x
+const {v4:uuidv4} = require('uuid'); 
 const cookieParser = require('cookie-parser');
 
 const http = require('http').createServer(app);
@@ -65,8 +66,9 @@ const handleImport = (socket, importLink) => {
             // download youtube video...
             socket.emit('task-update', 'start');
             socket.emit('task-update', 'Starting Import');
-            const video = youtubedl(importLink, { filter: format => format.container === 'mp4' });
 
+            const video = youtubedl(importLink, { filter: format => format.container === 'mp4' });
+            console.log('test');
             video.on('info', function(info) {
                 // emit error if file is too large.
                 let formats =  info.player_response.streamingData.formats
@@ -117,8 +119,6 @@ const handleImport = (socket, importLink) => {
             video.on('error', function error(err) {
                 socket.emit('dismiss-success-snackbars');
                 socket.emit('task-failed', 'Video ID not found');
-
-                
             })
             video.pipe(fs.createWriteStream('tmp/videotest.mp4'));
         } else {
